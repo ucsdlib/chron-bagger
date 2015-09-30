@@ -1,0 +1,86 @@
+package org.chronopolis.bag.core;
+
+import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Flickering in the blue light
+ *
+ * Created by shake on 7/30/15.
+ */
+public class PayloadManifest implements Manifest {
+
+    private Set<PayloadFile> files;
+    private final Path path;
+
+    private PipedInputStream is;
+    private PipedOutputStream os;
+
+    public PayloadManifest() {
+        this.files = new HashSet<>();
+        this.is = new PipedInputStream();
+        this.os = new PipedOutputStream();
+        this.path = Paths.get("manifest-sha256.txt");
+    }
+
+    public static PayloadManifest loadFromStream(InputStream is, Path base) {
+        BufferedReader reader =
+                new BufferedReader(new InputStreamReader(is));
+        PayloadManifest manifest = new PayloadManifest();
+
+        String line;
+        try {
+            while ((line = reader.readLine()) != null) {
+                String[] split = line.split("\\s+");
+                String hash = split[0];
+                String path = split[1];
+
+                PayloadFile payload = new PayloadFile();
+                payload.setFile(path);
+                payload.setDigest(hash);
+                payload.setOrigin(base.resolve(path));
+
+                manifest.addPayloadFile(payload);
+            }
+        } catch (IOException e) {
+            System.out.println("Fuuuuuuuuck from payloadmanifest");
+        }
+
+        return manifest;
+    }
+
+    public void addPayloadFile(PayloadFile file) {
+        System.out.println("Adding payload file " + file.getFile());
+        files.add(file);
+    }
+
+    public Set<PayloadFile> getFiles() {
+        return files;
+    }
+
+    @Override
+    public Path getPath() {
+        return path;
+    }
+
+    @Override
+    // TODO: Fuckin' lazyify this shit
+    public InputStream getInputStream() {
+        try {
+            is.connect(os);
+            for (PayloadFile file : files) {
+                System.out.println(file.getFile());
+                String line = file.getDigest().toString() + "  " + file.getFile().toString() + "\r\n";
+                os.write(line.getBytes());
+            }
+            os.close();
+        } catch (IOException e) {
+            System.out.println("Fuuuuuuuuck from payloadmanifest::getIS");
+        }
+
+        return is;
+    }
+}
