@@ -13,6 +13,8 @@ import java.util.Set;
  */
 public class PayloadManifest implements Manifest {
 
+    private static final int MAX_SPLIT = 2;
+
     private Set<PayloadFile> files;
     private final Path path;
 
@@ -34,7 +36,7 @@ public class PayloadManifest implements Manifest {
         String line;
         try {
             while ((line = reader.readLine()) != null) {
-                String[] split = line.split("\\s+");
+                String[] split = line.split("\\s+", MAX_SPLIT);
                 String hash = split[0];
                 String path = split[1];
 
@@ -59,6 +61,16 @@ public class PayloadManifest implements Manifest {
 
     public Set<PayloadFile> getFiles() {
         return files;
+    }
+
+    @Override
+    public long getSize() {
+        long size = 0;
+        for (PayloadFile file : files) {
+            String line = file.getDigest().toString() + "  " + file.getFile().toString() + "\r\n";
+            size += line.length();
+        }
+        return size;
     }
 
     @Override

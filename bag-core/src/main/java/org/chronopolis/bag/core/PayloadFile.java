@@ -45,6 +45,10 @@ public class PayloadFile {
         this.digest = HashCode.fromString(digest);
     }
 
+    public long getSize() {
+        return origin.toFile().length();
+    }
+
     public InputStream getInputStream() {
         try {
             return Files.newInputStream(origin);

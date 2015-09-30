@@ -37,6 +37,16 @@ public class TagManifest implements Manifest {
     }
 
     @Override
+    public long getSize() {
+        long size = 0;
+        for (Map.Entry<Path, HashCode> entry : files.entrySet()) {
+            String line = entry.getValue().toString() + "  " + entry.getKey().toString() + "\r\n";
+            size += line.length();
+        }
+        return size;
+    }
+
+    @Override
     public Path getPath() {
         return path;
     }

@@ -10,6 +10,7 @@ import java.nio.file.Path;
  */
 public interface TagFile {
 
+    long getSize();
     Path getPath();
     InputStream getInputStream();
 

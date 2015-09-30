@@ -22,6 +22,11 @@ public class OnDiskTagFile implements TagFile {
     }
 
     @Override
+    public long getSize() {
+        return tag.toFile().length();
+    }
+
+    @Override
     public Path getPath() {
         return normalized;
     }

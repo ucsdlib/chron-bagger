@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -51,11 +50,26 @@ public class BagInfo implements TagFile {
         }
     }
 
+    // Possibly use JodaTime instead
     public static DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private final Path path;
 
+    /**
+     * Map of the various Tags for a bag-info file
+     *
+     */
     private Multimap<Tag, String> tags = ArrayListMultimap.create();
+
+    /**
+     * InputStream for writing tags
+     *
+     */
     private PipedInputStream is;
+
+    /**
+     * Output stream connected to the InputStream
+     *
+     */
     private PipedOutputStream os;
 
 
@@ -68,6 +82,20 @@ public class BagInfo implements TagFile {
     public BagInfo withInfo(Tag identifier, String value) {
         tags.put(identifier, value);
         return this;
+    }
+
+    @Override
+    public long getSize() {
+        long size = 0;
+        for (Map.Entry<Tag, String> entry : tags.entries()) {
+            StringBuilder tag = new StringBuilder();
+            tag.append(entry.getKey().getName())
+                    .append(": ")
+                    .append(entry.getValue())
+                    .append("\r\n");
+            size += tag.toString().length();
+        }
+        return size;
     }
 
     @Override

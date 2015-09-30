@@ -23,7 +23,7 @@ public class BagIt implements TagFile {
     public static final String BAGIT_VERSION = "BagIt-Version: 0.97";
     public static final String TAG_CHARSET = "Tag-File-Character-Encoding: UTF-8";
 
-    private Path path;
+    private final Path path;
     private PipedInputStream is;
     private PipedOutputStream os;
     private ImmutableSet<String> tags;
@@ -35,6 +35,15 @@ public class BagIt implements TagFile {
         this.tags = ImmutableSet.of(BAGIT_VERSION, CRLF, TAG_CHARSET);
     }
 
+
+    @Override
+    public long getSize() {
+        long size = 0;
+        for (String tag : tags) {
+            size += tag.length();
+        }
+        return size;
+    }
 
     @Override
     public Path getPath() {
