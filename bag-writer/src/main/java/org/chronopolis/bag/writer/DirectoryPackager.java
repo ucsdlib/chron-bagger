@@ -6,7 +6,6 @@ import com.google.common.hash.HashingOutputStream;
 import org.chronopolis.bag.core.Manifest;
 import org.chronopolis.bag.core.PayloadFile;
 import org.chronopolis.bag.core.TagFile;
-import org.chronopolis.bag.core.TagManifest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,7 +47,6 @@ public class DirectoryPackager implements Packager {
 
     @Override
     public HashCode writeTagFile(TagFile tagFile, HashFunction function) {
-        OutputStream os = null;
         HashingOutputStream hos = null;
         // tagFile.getName() or tagFile.getPath()
         // "sub/dir/name" not really the name
@@ -57,9 +55,10 @@ public class DirectoryPackager implements Packager {
         // probably want 1 method for transferring actual bytes/channel
         Path tag = output.resolve(tagFile.getPath());
         try {
-            os = Files.newOutputStream(tag, StandardOpenOption.CREATE);
-            hos = new HashingOutputStream(function, os);
-            transfer(tagFile.getInputStream(), hos);
+            writeFile(tag, function, tagFile.getInputStream());
+            // os = Files.newOutputStream(tag, StandardOpenOption.CREATE);
+            // hos = new HashingOutputStream(function, os);
+            // transfer(tagFile.getInputStream(), hos);
         } catch (IOException e) {
             System.out.println("fuuuuuuuuuuuck in packager");
         }
@@ -69,15 +68,15 @@ public class DirectoryPackager implements Packager {
 
     @Override
     public HashCode writeManifest(Manifest manifest, HashFunction function) {
-        OutputStream os = null;
         HashingOutputStream hos = null;
 
         Path tag = output.resolve(manifest.getPath());
         try {
-            os = Files.newOutputStream(tag, StandardOpenOption.CREATE);
-            hos = new HashingOutputStream(function, os);
-            System.out.println(manifest.getInputStream());
-            transfer(manifest.getInputStream(), hos);
+            writeFile(tag, function, manifest.getInputStream());
+            // os = Files.newOutputStream(tag, StandardOpenOption.CREATE);
+            // hos = new HashingOutputStream(function, os);
+            // System.out.println(manifest.getInputStream());
+            // transfer(manifest.getInputStream(), hos);
         } catch (IOException e) {
             System.out.println("fuuuuuuuuuuuck in packager");
         }
@@ -95,14 +94,14 @@ public class DirectoryPackager implements Packager {
             System.out.println("fuuuuuuuuuuuck in packager::writePayloadFileMkDirs");
         }
 
-        OutputStream os = null;
         HashingOutputStream hos = null;
 
         try {
-            System.out.println(payload);
-            os = Files.newOutputStream(payload, StandardOpenOption.CREATE);
-            hos = new HashingOutputStream(function, os);
-            transfer(payloadFile.getInputStream(), hos);
+            writeFile(payload, function, payloadFile.getInputStream());
+            // System.out.println(payload);
+            // os = Files.newOutputStream(payload, StandardOpenOption.CREATE);
+            // hos = new HashingOutputStream(function, os);
+            // transfer(payloadFile.getInputStream(), hos);
         } catch (IOException e) {
             System.out.println("fuuuuuuuuuuuck in packager::writePayloadFile");
         }
@@ -110,9 +109,11 @@ public class DirectoryPackager implements Packager {
         return hos.hash();
     }
 
-    @Override
-    public HashCode writeTagManifest(TagManifest tagManifest, HashFunction function) {
-        throw new RuntimeException("Not yet implemented");
+    private HashCode writeFile(Path out, HashFunction function, InputStream is) throws IOException {
+        OutputStream os = Files.newOutputStream(out, StandardOpenOption.CREATE);
+        HashingOutputStream hos = new HashingOutputStream(function, os);
+        transfer(is, hos);
+        return hos.hash();
     }
 
     // TODO: move up to Packager

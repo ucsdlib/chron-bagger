@@ -66,65 +66,54 @@ public class TarPackager implements Packager {
 
     @Override
     public HashCode writeTagFile(TagFile tagFile, HashFunction function) {
-        Path tarPath = getTarPath(tagFile.getPath());
-        HashingInputStream his = null;
-        TarArchiveEntry entry = new TarArchiveEntry(tarPath.toString());
-        try {
-            entry.setSize(tagFile.getSize());
-            outputStream.putArchiveEntry(entry);
-            his = new HashingInputStream(function, tagFile.getInputStream());
-            long size = transfer(his, outputStream);
-            entry.setSize(size);
-            System.out.println("Wrote " + size + " bytes maybe");
-            outputStream.closeArchiveEntry();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return his.hash();
+        Path path = getTarPath(tagFile.getPath());
+        return writeFile(function, tagFile.getInputStream(), path.toString(), tagFile.getSize());
     }
 
     @Override
     public HashCode writeManifest(Manifest manifest, HashFunction function) {
-        Path tarPath = getTarPath(manifest.getPath());
-        TarArchiveEntry entry = new TarArchiveEntry(tarPath.toString());
-        HashingInputStream his = null;
-        try {
-            entry.setSize(manifest.getSize());
-            outputStream.putArchiveEntry(entry);
-            his = new HashingInputStream(function, manifest.getInputStream());
-            long size = transfer(his, outputStream);
-            System.out.println("Wrote " + size + " bytes maybe");
-            outputStream.closeArchiveEntry();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return his.hash();
+        Path path = getTarPath(manifest.getPath());
+        return writeFile(function, manifest.getInputStream(), path.toString(), manifest.getSize());
     }
 
     @Override
     public HashCode writePayloadFile(PayloadFile payloadFile, HashFunction function) {
-        Path tarPath = getTarPath(payloadFile.getFile());
+        Path path = getTarPath(payloadFile.getFile());
+        return writeFile(function, payloadFile.getInputStream(), path.toString(), payloadFile.getSize());
+    }
+
+    private HashCode writeFile(HashFunction function, InputStream is,  String path, long size) {
         HashingInputStream his = null;
-        TarArchiveEntry entry = new TarArchiveEntry(tarPath.toString());
+        TarArchiveEntry entry = new TarArchiveEntry(path);
         try {
-            System.out.println("Setting payload size of " + payloadFile.getSize());
-            entry.setSize(payloadFile.getSize());
+            System.out.println("Setting payload size of " + size);
+            entry.setSize(size);
             outputStream.putArchiveEntry(entry);
-            his = new HashingInputStream(function, payloadFile.getInputStream());
+            his = new HashingInputStream(function, is);
             transfer(his, outputStream);
             outputStream.closeArchiveEntry();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return his.hash();
     }
 
     private Path getTarPath(Path relPath) {
         Path root = Paths.get(name + "/");
-        Path tarPath = root.resolve(relPath);
-        return tarPath;
+        Path path = root.resolve(relPath);
+        return path;
     }
 
+    /**
+     * Transfer the content of the input stream to the output stream
+     * without closing the underlying output stream
+     *
+     * @param is
+     * @param os
+     * @return
+     * @throws IOException
+     */
     private long transfer(InputStream is, OutputStream os) throws IOException {
         long written = 0;
         // TODO: Channels... or at least nio lols...
