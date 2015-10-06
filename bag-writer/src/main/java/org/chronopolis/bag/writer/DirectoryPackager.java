@@ -55,7 +55,7 @@ public class DirectoryPackager implements Packager {
         // probably want 1 method for transferring actual bytes/channel
         Path tag = output.resolve(tagFile.getPath());
         try {
-            writeFile(tag, function, tagFile.getInputStream());
+            return writeFile(tag, function, tagFile.getInputStream());
             // os = Files.newOutputStream(tag, StandardOpenOption.CREATE);
             // hos = new HashingOutputStream(function, os);
             // transfer(tagFile.getInputStream(), hos);
@@ -72,7 +72,7 @@ public class DirectoryPackager implements Packager {
 
         Path tag = output.resolve(manifest.getPath());
         try {
-            writeFile(tag, function, manifest.getInputStream());
+            return writeFile(tag, function, manifest.getInputStream());
             // os = Files.newOutputStream(tag, StandardOpenOption.CREATE);
             // hos = new HashingOutputStream(function, os);
             // System.out.println(manifest.getInputStream());
@@ -97,7 +97,7 @@ public class DirectoryPackager implements Packager {
         HashingOutputStream hos = null;
 
         try {
-            writeFile(payload, function, payloadFile.getInputStream());
+            return writeFile(payload, function, payloadFile.getInputStream());
             // System.out.println(payload);
             // os = Files.newOutputStream(payload, StandardOpenOption.CREATE);
             // hos = new HashingOutputStream(function, os);
