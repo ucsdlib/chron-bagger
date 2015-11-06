@@ -1,7 +1,7 @@
 package org.chronopolis.bag.core;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -17,10 +17,11 @@ public class Bag {
     private long numFiles = 0;
 
     // Tag files
-    private List<TagFile> tags;
+    // TODO: Separate fields for BagIt/BagInfo?
+    private Set<TagFile> tags;
 
     // Payload files
-    private List<PayloadFile> files;
+    private Set<PayloadFile> files;
 
     // Our two manifests
     private TagManifest tagManifest;
@@ -61,35 +62,35 @@ public class Bag {
         return this;
 	}
 
-	public List<TagFile> getTags() {
+	public Set<TagFile> getTags() {
 		return tags;
 	}
 
-	public Bag setTags(List<TagFile> tags) {
+	public Bag setTags(Set<TagFile> tags) {
 		this.tags = tags;
         return this;
 	}
 
 	public Bag addTag(TagFile tag) {
         if (tags == null) {
-            tags = new ArrayList<>(); 
+            tags = new HashSet<>();
         }
 		this.tags.add(tag);
         return this;
 	}
     
-	public List<PayloadFile> getFiles() {
+	public Set<PayloadFile> getFiles() {
 		return files;
 	}
 
-	public Bag setFiles(List<PayloadFile> files) {
+	public Bag setFiles(Set<PayloadFile> files) {
 		this.files = files;
         return this;
 	}
 
     public Bag addFile(PayloadFile file) { 
         if (files == null) {
-            files = new ArrayList<>();
+            files = new HashSet<>();
         }
 
         this.files.add(file);
@@ -131,4 +132,11 @@ public class Bag {
         return this;
 	}
 
+    public void addFiles(Set<PayloadFile> files) {
+        if (this.files == null) {
+            this.files = new HashSet<>();
+        }
+
+        this.files.addAll(files);
+    }
 }
