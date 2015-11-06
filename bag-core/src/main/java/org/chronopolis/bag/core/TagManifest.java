@@ -44,7 +44,7 @@ public class TagManifest implements Manifest {
     public long getSize() {
         long size = 0;
         for (Map.Entry<Path, HashCode> entry : files.entrySet()) {
-            String line = entry.getValue().toString() + "  " + entry.getKey().toString() + "\r\n";
+            String line = entry.getValue().toString() + "  " + entry.getKey().toString() + "\n";
             size += line.length();
         }
         return size;
@@ -61,7 +61,7 @@ public class TagManifest implements Manifest {
         try {
             is.connect(os);
             for (Map.Entry<Path, HashCode> entry : files.entrySet()) {
-                String line = entry.getValue().toString() + "  " + entry.getKey().toString() + "\r\n";
+                String line = entry.getValue().toString() + "  " + entry.getKey().toString() + "\n";
                 os.write(line.getBytes());
             }
             os.close();

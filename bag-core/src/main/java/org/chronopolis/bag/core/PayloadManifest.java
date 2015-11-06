@@ -1,12 +1,17 @@
 package org.chronopolis.bag.core;
 
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -27,7 +32,7 @@ public class PayloadManifest implements Manifest {
     private PipedOutputStream os;
 
     public PayloadManifest() {
-        this.files = new HashSet<>();
+        this.files = Sets.newLinkedHashSet();
         this.is = new PipedInputStream();
         this.os = new PipedOutputStream();
         // TODO: specify the default path or something
@@ -50,6 +55,7 @@ public class PayloadManifest implements Manifest {
                 payload.setFile(path);
                 payload.setDigest(hash);
                 payload.setOrigin(base.resolve(path));
+                log.info("Adding payload file {}", path);
 
                 manifest.addPayloadFile(payload);
             }
@@ -74,7 +80,7 @@ public class PayloadManifest implements Manifest {
         // TODO: Can memoize this
         long size = 0;
         for (PayloadFile file : files) {
-            String line = file.getDigest().toString() + "  " + file.getFile().toString() + "\r\n";
+            String line = file.getDigest().toString() + "  " + file.getFile().toString() + "\n";
             size += line.length();
         }
         return size;
@@ -92,7 +98,7 @@ public class PayloadManifest implements Manifest {
             is.connect(os);
             for (PayloadFile file : files) {
                 System.out.println(file.getFile());
-                String line = file.getDigest().toString() + "  " + file.getFile().toString() + "\r\n";
+                String line = file.getDigest().toString() + "  " + file.getFile().toString() + "\n";
                 os.write(line.getBytes());
             }
             os.close();
