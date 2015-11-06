@@ -1,6 +1,8 @@
 package org.chronopolis.bag.core;
 
 import com.google.common.hash.HashCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +15,8 @@ import java.nio.file.Paths;
  * Created by shake on 7/30/15.
  */
 public class PayloadFile {
+
+    private final Logger log = LoggerFactory.getLogger(PayloadFile.class);
 
     private Path file;
     private Path origin;
@@ -53,7 +57,7 @@ public class PayloadFile {
         try {
             return Files.newInputStream(origin);
         } catch (IOException e) {
-            System.out.println("Fuuuuuuuuuuuck in payload file");
+            log.error("Error while getting input stream for PayloadFile {}", origin, e);
             return null;
         }
     }

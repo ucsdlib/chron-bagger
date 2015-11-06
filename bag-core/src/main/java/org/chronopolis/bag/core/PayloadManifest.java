@@ -1,5 +1,8 @@
 package org.chronopolis.bag.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,6 +16,8 @@ import java.util.Set;
  */
 public class PayloadManifest implements Manifest {
 
+    private static final Logger log = LoggerFactory.getLogger(PayloadManifest.class);
+
     private static final int MAX_SPLIT = 2;
 
     private Set<PayloadFile> files;
@@ -25,6 +30,7 @@ public class PayloadManifest implements Manifest {
         this.files = new HashSet<>();
         this.is = new PipedInputStream();
         this.os = new PipedOutputStream();
+        // TODO: specify the default path or something
         this.path = Paths.get("manifest-sha256.txt");
     }
 
@@ -48,14 +54,14 @@ public class PayloadManifest implements Manifest {
                 manifest.addPayloadFile(payload);
             }
         } catch (IOException e) {
-            System.out.println("Fuuuuuuuuck from payloadmanifest");
+            log.error("Error reading manifest", e);
         }
 
         return manifest;
     }
 
     public void addPayloadFile(PayloadFile file) {
-        System.out.println("Adding payload file " + file.getFile());
+        log.trace("Adding payload file {}", file.getFile());
         files.add(file);
     }
 
@@ -65,6 +71,7 @@ public class PayloadManifest implements Manifest {
 
     @Override
     public long getSize() {
+        // TODO: Can memoize this
         long size = 0;
         for (PayloadFile file : files) {
             String line = file.getDigest().toString() + "  " + file.getFile().toString() + "\r\n";
@@ -90,7 +97,7 @@ public class PayloadManifest implements Manifest {
             }
             os.close();
         } catch (IOException e) {
-            System.out.println("Fuuuuuuuuck from payloadmanifest::getIS");
+            log.error("Error while writing payload manifest {}", e);
         }
 
         return is;

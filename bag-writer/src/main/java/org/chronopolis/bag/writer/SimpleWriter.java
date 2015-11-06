@@ -1,8 +1,20 @@
 package org.chronopolis.bag.writer;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
-import org.chronopolis.bag.core.*;
+
+import org.chronopolis.bag.core.Bag;
+import org.chronopolis.bag.core.BagInfo;
+import org.chronopolis.bag.core.BagIt;
+import org.chronopolis.bag.core.Digest;
+import org.chronopolis.bag.core.PayloadFile;
+import org.chronopolis.bag.core.PayloadManifest;
+import org.chronopolis.bag.core.TagFile;
+import org.chronopolis.bag.core.TagManifest;
+import org.chronopolis.bag.core.Unit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -12,10 +24,12 @@ import java.util.concurrent.Future;
 
 /**
  * Basic implementation of a Writer
+ * TODO: Make the bag the unit of work, instead of adding files to it
  *
  * Created by shake on 8/6/2015.
  */
 public class SimpleWriter extends Writer {
+    private final Logger log = LoggerFactory.getLogger(SimpleWriter.class);
 
     // Things to help us when writing files
     private Unit maxSize;
@@ -44,9 +58,9 @@ public class SimpleWriter extends Writer {
         validate = false;
         preserveManifest = false;
         this.bagIt = new BagIt();
-        this.tags = new ArrayList<TagFile>();
-        this.payloadFiles = new ArrayList<PayloadFile>();
-        this.payloadDirectories = new ArrayList<Path>();
+        this.tags = new ArrayList<>();
+        this.payloadFiles = new ArrayList<>();
+        this.payloadDirectories = new ArrayList<>();
         this.tagManifest = new TagManifest();
     }
 
@@ -88,9 +102,6 @@ public class SimpleWriter extends Writer {
 
     @Override
     public Writer withTagFile(TagFile file) {
-        // TODO: If we have either a bag info file or bagit file, handle them separately
-        // (for no real reason)
-
         tags.add(file);
         return this;
     }
@@ -108,7 +119,6 @@ public class SimpleWriter extends Writer {
     }
 
     public Writer withPayloadFiles(Set<PayloadFile> files) {
-        System.out.println(files);
         payloadFiles.addAll(files);
         return this;
     }
@@ -116,7 +126,7 @@ public class SimpleWriter extends Writer {
     @Override
     public Writer withPayloadDirectory(Path directory) {
         if (directory.toFile().isFile()) {
-            // log error
+            log.error("Unable to add file {} as a directory", directory);
             return this;
         }
 
@@ -139,62 +149,70 @@ public class SimpleWriter extends Writer {
 
     @Override
     public List<Bag> write() {
-        Bag b;
+        Bag b = new Bag();
         HashCode hashCode;
         HashFunction hash = digest.getHashFunction();
-        System.out.println("Starting build for " + namingSchema.getName(0));
+        log.info("Starting build for {}", namingSchema.getName(0));
         packager.startBuild(namingSchema.getName(0));
 
         // Write payload files
         // Validate if wanted
-        System.out.println("Writing payload files");
+        log.trace("Writing payload files");
         for (PayloadFile payloadFile : payloadFiles) {
-            System.out.print(payloadFile.getFile() + ": ");
+            log.trace(payloadFile.getFile() + ": ");
             hashCode = packager.writePayloadFile(payloadFile, hash);
-            System.out.println(hashCode.toString());
+            log.trace(hashCode.toString());
 
             if (validate) {
                 if (!hashCode.equals(payloadFile.getDigest())) {
-                    System.out.println("Fuuuuuuuuck mismatch digest");
+                    log.error("Digest mismatch for file {}. Expected {}; Found {}",
+                            new Object[] {payloadFile, payloadFile.getDigest(), hashCode});
+                    // TODO: Save error to bag
                 }
             }
+
+            b.addFile(payloadFile);
         }
 
         // Write manifest
-        System.out.print("Writing manifest:");
+        log.trace("Writing manifest:");
         hashCode = packager.writeManifest(manifest, hash);
         tagManifest.addTagFile(manifest.getPath(), hashCode);
-        System.out.printf("HashCode is: %s\n", hashCode.toString());
+        b.setManifest(manifest);
+        log.trace("HashCode is: %s\n", hashCode.toString());
 
         // Write bag-info
-        System.out.println("Writing bag-info:");
+        log.trace("Writing bag-info:");
         hashCode = packager.writeTagFile(bagInfo, hash);
         tagManifest.addTagFile(bagInfo.getPath(), hashCode);
-        System.out.printf("HashCode is: %s\n", hashCode.toString());
+        b.addTag(bagInfo);
+        log.trace("HashCode is: %s\n", hashCode.toString());
 
         // Write bagit
-        System.out.println("Writing bagit:");
+        log.trace("Writing bagit:");
         hashCode = packager.writeTagFile(bagIt, hash);
         tagManifest.addTagFile(bagIt.getPath(), hashCode);
-        System.out.printf("HashCode is: %s\n", hashCode.toString());
+        b.addTag(bagIt);
+        log.trace("HashCode is: %s\n", hashCode.toString());
 
         // Write extra tag files
-        System.out.println("Writing tag files:");
+        log.trace("Writing tag files:");
         for (TagFile tag : tags) {
-            System.out.println(tag.getPath());
+            log.trace("{}", tag.getPath());
             hashCode = packager.writeTagFile(tag, hash);
             tagManifest.addTagFile(tag.getPath(), hashCode);
-            System.out.printf("HashCode is: %s", hashCode.toString());
+            b.addTag(tag);
+            log.trace("HashCode is: %s", hashCode.toString());
         }
 
         // Write the tagmanifest
-        System.out.print("\nWriting tagmanifest:");
+        log.trace("\nWriting tagmanifest:");
         hashCode = packager.writeManifest(tagManifest, hash);
-        // tagManifest.addTagFile(manifest.getPath(), hashCode);
-        System.out.printf("HashCode is: %s\n", hashCode.toString());
+        b.setTagManifest(tagManifest);
+        log.trace("HashCode is: %s\n", hashCode.toString());
 
         packager.finishBuild();
-        return null;
+        return ImmutableList.<Bag>of(b);
     }
 
     @Override

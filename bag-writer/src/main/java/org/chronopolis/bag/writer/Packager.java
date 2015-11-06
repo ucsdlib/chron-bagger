@@ -5,7 +5,6 @@ import com.google.common.hash.HashFunction;
 import org.chronopolis.bag.core.Manifest;
 import org.chronopolis.bag.core.PayloadFile;
 import org.chronopolis.bag.core.TagFile;
-import org.chronopolis.bag.core.TagManifest;
 
 /**
  * Interface describing the actual writing of bags to an output stream
@@ -53,14 +52,5 @@ public interface Packager {
      * @return the digest of the payload file
      */
     HashCode writePayloadFile(PayloadFile payloadFile, HashFunction function);
-
-    /**
-     * Write the tagmanifest file for the bag
-     *
-     * @param tagManifest
-     * @param function
-     * @return the digest of the tagmanifest file
-     */
-    HashCode writeTagManifest(TagManifest tagManifest, HashFunction function);
 
 }

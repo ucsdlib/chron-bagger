@@ -2,6 +2,8 @@ package org.chronopolis.bag.core;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,6 +53,7 @@ public class BagInfo implements TagFile {
     }
 
     // Possibly use JodaTime instead
+    private final Logger log = LoggerFactory.getLogger(BagInfo.class);
     public static DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private final Path path;
 
@@ -107,17 +110,18 @@ public class BagInfo implements TagFile {
     public InputStream getInputStream() {
         try {
             is.connect(os);
+            // TODO: TagWriter which allows only 80 characters per line
             for (Map.Entry<Tag, String> entry : tags.entries()) {
                 StringBuilder tag = new StringBuilder();
                 tag.append(entry.getKey().getName())
                         .append(": ")
                         .append(entry.getValue())
-                        .append("\r\n");
+                        .append("\r\n"); // TODO: Constant for carriage return?
                 os.write(tag.toString().getBytes());
             }
             os.close();
         } catch (IOException e) {
-            System.out.println("FUuuuuuuck in BagInfo");
+            log.error("Error writing BagInfo InputStream", e);
         }
         return is;
     }

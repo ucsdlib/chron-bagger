@@ -15,8 +15,8 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        Path base = Paths.get("/home/shake/bags");
-        Path out = base.resolve("output");
+        Path base = Paths.get("/tmp/bags");
+        Path out = base.resolve("out");
         Path tag = base.resolve("in/tag-1.txt");
         Path payload = base.resolve("in/manifest-sha256.txt");
         PayloadManifest payloadManifest = PayloadManifest.loadFromStream(Files.newInputStream(payload), base.resolve("in"));
@@ -31,7 +31,8 @@ public class Main {
                 .withPayloadManifest(payloadManifest)
                 .withBagInfo(info)
                 .withNamingSchema(new SimpleNamingSchema("my-bag"))
-                .withPackager(new DirectoryPackager(out))
+                //.withPackager(new DirectoryPackager(out))
+                .withPackager(new TarPackager(out))
                 .withDigest(Digest.SHA_256)
                 .withTagFile(new OnDiskTagFile(tag));
 

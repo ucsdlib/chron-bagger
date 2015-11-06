@@ -6,6 +6,8 @@ import com.google.common.hash.HashingOutputStream;
 import org.chronopolis.bag.core.Manifest;
 import org.chronopolis.bag.core.PayloadFile;
 import org.chronopolis.bag.core.TagFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +26,7 @@ import java.nio.file.StandardOpenOption;
  * Created by shake on 8/6/2015.
  */
 public class DirectoryPackager implements Packager {
+    private final Logger log = LoggerFactory.getLogger(DirectoryPackager.class);
 
     private final Path base;
     private Path output;
@@ -56,11 +59,8 @@ public class DirectoryPackager implements Packager {
         Path tag = output.resolve(tagFile.getPath());
         try {
             return writeFile(tag, function, tagFile.getInputStream());
-            // os = Files.newOutputStream(tag, StandardOpenOption.CREATE);
-            // hos = new HashingOutputStream(function, os);
-            // transfer(tagFile.getInputStream(), hos);
         } catch (IOException e) {
-            System.out.println("fuuuuuuuuuuuck in packager");
+            log.error("Error writing TagFile {}", tag, e);
         }
 
         return hos.hash();
@@ -73,12 +73,8 @@ public class DirectoryPackager implements Packager {
         Path tag = output.resolve(manifest.getPath());
         try {
             return writeFile(tag, function, manifest.getInputStream());
-            // os = Files.newOutputStream(tag, StandardOpenOption.CREATE);
-            // hos = new HashingOutputStream(function, os);
-            // System.out.println(manifest.getInputStream());
-            // transfer(manifest.getInputStream(), hos);
         } catch (IOException e) {
-            System.out.println("fuuuuuuuuuuuck in packager");
+            log.error("Error writing Manifest {}", tag, e);
         }
 
         return hos.hash();
@@ -91,19 +87,15 @@ public class DirectoryPackager implements Packager {
         try {
             Files.createDirectories(payload.getParent());
         } catch (IOException e) {
-            System.out.println("fuuuuuuuuuuuck in packager::writePayloadFileMkDirs");
+            log.error("Error creating directories for {}", payload, e);
         }
 
         HashingOutputStream hos = null;
 
         try {
             return writeFile(payload, function, payloadFile.getInputStream());
-            // System.out.println(payload);
-            // os = Files.newOutputStream(payload, StandardOpenOption.CREATE);
-            // hos = new HashingOutputStream(function, os);
-            // transfer(payloadFile.getInputStream(), hos);
         } catch (IOException e) {
-            System.out.println("fuuuuuuuuuuuck in packager::writePayloadFile");
+            log.error("Error writing PayloadFile {}", payload, e);
         }
 
         return hos.hash();
@@ -118,10 +110,10 @@ public class DirectoryPackager implements Packager {
 
     // TODO: move up to Packager
     private void transfer(InputStream is, OutputStream os) throws IOException {
-        // TODO: Channels... or at least nio lols...
         ReadableByteChannel inch = Channels.newChannel(is);
         WritableByteChannel wrch = Channels.newChannel(os);
 
+        // 1MB, might want to make this configurable
         ByteBuffer buffer = ByteBuffer.allocateDirect(32768);
         while (inch.read(buffer) != -1) {
             buffer.flip();

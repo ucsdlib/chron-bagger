@@ -1,6 +1,8 @@
 package org.chronopolis.bag.core;
 
 import com.google.common.collect.ImmutableSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +17,8 @@ import java.nio.file.Paths;
  * Created by shake on 7/29/15.
  */
 public class BagIt implements TagFile {
+
+    private final Logger log = LoggerFactory.getLogger(BagIt.class);
 
     // Do we need this? Not really... I mean... just saying...
     // private static final String BAGIT_PATH = "bagit.txt";
@@ -59,7 +63,7 @@ public class BagIt implements TagFile {
             }
             os.close();
         } catch (IOException e) {
-            System.out.println("FUuuuuuuck in BagIt");
+            log.error("Error writing BagIt InputStream", e);
         }
 
         return is;

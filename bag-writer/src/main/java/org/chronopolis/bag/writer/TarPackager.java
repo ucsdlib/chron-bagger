@@ -8,6 +8,8 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.chronopolis.bag.core.Manifest;
 import org.chronopolis.bag.core.PayloadFile;
 import org.chronopolis.bag.core.TagFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -22,9 +24,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
+ *
  * Created by shake on 8/28/15.
  */
 public class TarPackager implements Packager {
+    private final Logger log = LoggerFactory.getLogger(TarPackager.class);
 
     private final String TAR = ".tar";
 
@@ -50,7 +54,7 @@ public class TarPackager implements Packager {
             OutputStream os = new FileOutputStream(tarball.toString());
             this.outputStream = new TarArchiveOutputStream(os);
         }catch (FileNotFoundException e) {
-        } catch (IOException e) {
+            log.error("Error create TarArchiveOutputStream", e);
         }
 
         this.outputStream.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
@@ -86,14 +90,14 @@ public class TarPackager implements Packager {
         HashingInputStream his = null;
         TarArchiveEntry entry = new TarArchiveEntry(path);
         try {
-            System.out.println("Setting payload size of " + size);
+            log.trace("Setting payload size of " + size);
             entry.setSize(size);
             outputStream.putArchiveEntry(entry);
             his = new HashingInputStream(function, is);
             transfer(his, outputStream);
             outputStream.closeArchiveEntry();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error writing TarArchiveEntry {}", path, e);
         }
 
         return his.hash();

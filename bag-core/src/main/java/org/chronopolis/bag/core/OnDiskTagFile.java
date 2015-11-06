@@ -1,5 +1,8 @@
 package org.chronopolis.bag.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -11,6 +14,7 @@ import java.nio.file.Path;
  * Created by shake on 8/9/2015.
  */
 public class OnDiskTagFile implements TagFile {
+    private final Logger log = LoggerFactory.getLogger(OnDiskTagFile.class);
 
     private final Path tag;
     private final Path normalized;
@@ -37,6 +41,7 @@ public class OnDiskTagFile implements TagFile {
             return Files.newInputStream(tag);
         } catch (IOException e) {
             System.out.println("fuuuuuuuuuuuck in tagfile");
+            log.error("Error while getting OnDiskTagFile InputStream for {}", tag, e);
             return null;
         }
     }

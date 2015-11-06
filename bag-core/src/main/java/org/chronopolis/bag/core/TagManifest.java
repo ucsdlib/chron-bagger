@@ -1,6 +1,8 @@
 package org.chronopolis.bag.core;
 
 import com.google.common.hash.HashCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,9 +14,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ *
  * Created by shake on 7/30/15.
  */
 public class TagManifest implements Manifest {
+    private final Logger log = LoggerFactory.getLogger(TagManifest.class);
 
     private PipedInputStream is;
     private PipedOutputStream os;
@@ -62,7 +66,7 @@ public class TagManifest implements Manifest {
             }
             os.close();
         } catch (IOException e) {
-            System.out.println("Fuuuuuuuuck from tagmanifest::getIS");
+            log.error("Error while writing TagManifest InputStream", e);
         }
 
         return is;
