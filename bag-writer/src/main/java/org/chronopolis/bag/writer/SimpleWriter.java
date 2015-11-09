@@ -139,8 +139,10 @@ public class SimpleWriter extends Writer {
     public List<Bag> write() {
         HashCode hashCode;
         HashFunction hash = digest.getHashFunction();
-        log.info("Starting build for {}", namingSchema.getName(0));
-        packager.startBuild(namingSchema.getName(0));
+        String name = namingSchema.getName(0);
+        log.info("Starting build for {}", name);
+        b.setName(name);
+        packager.startBuild(name);
         TagManifest tagManifest = b.getTagManifest();
 
         // Write payload files
