@@ -26,18 +26,19 @@ public class PayloadManifest implements Manifest {
     private static final int MAX_SPLIT = 2;
 
     private Set<PayloadFile> files;
-    private final Path path;
+    private Digest digest;
 
     private PipedInputStream is;
     private PipedOutputStream os;
 
     public PayloadManifest() {
+        // default
+        this.digest = Digest.SHA_256;
+
         // Use a LinkedHashSet to preserve ordering of the manifest
         this.files = Sets.newLinkedHashSet();
         this.is = new PipedInputStream();
         this.os = new PipedOutputStream();
-        // TODO: specify the default path or something
-        this.path = Paths.get("manifest-sha256.txt");
     }
 
     public static PayloadManifest loadFromStream(InputStream is, Path base) {
@@ -89,16 +90,15 @@ public class PayloadManifest implements Manifest {
 
     @Override
     public Path getPath() {
-        return path;
+        return Paths.get(PAYLOAD_NAME, digest.getBagFormattedName(), SUFFIX);
     }
 
     @Override
-    // TODO: Fuckin' lazyify this shit
+    // TODO: lazyify this
     public InputStream getInputStream() {
         try {
             is.connect(os);
             for (PayloadFile file : files) {
-                System.out.println(file.getFile());
                 String line = file.getDigest().toString() + "  " + file.getFile().toString() + "\n";
                 os.write(line.getBytes());
             }
@@ -108,5 +108,16 @@ public class PayloadManifest implements Manifest {
         }
 
         return is;
+    }
+
+    @Override
+    public Digest getDigest() {
+        return digest;
+    }
+
+    @Override
+    public Manifest setDigest(Digest digest) {
+        this.digest = digest;
+        return this;
     }
 }

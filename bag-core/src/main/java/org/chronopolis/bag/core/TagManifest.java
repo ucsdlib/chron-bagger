@@ -23,13 +23,13 @@ public class TagManifest implements Manifest {
     private PipedInputStream is;
     private PipedOutputStream os;
     private Map<Path, HashCode> files;
-    private final Path path;
+    private Digest digest;
 
     public TagManifest() {
+        this.digest = Digest.SHA_256;
         this.files = new HashMap<>();
         this.is = new PipedInputStream();
         this.os = new PipedOutputStream();
-        path = Paths.get("tagmanifest-sha256.txt");
     }
 
     public void addTagFile(Path file, HashCode hash) {
@@ -52,10 +52,11 @@ public class TagManifest implements Manifest {
 
     @Override
     public Path getPath() {
-        return path;
+        return Paths.get(TAG_NAME, digest.getBagFormattedName(), SUFFIX);
     }
 
-    // TODO: Fuckin' lazyify this shit
+    // TODO: lazyify this
+    // TODO: Share between Payload/this
     @Override
     public InputStream getInputStream() {
         try {
@@ -72,4 +73,14 @@ public class TagManifest implements Manifest {
         return is;
     }
 
+    @Override
+    public Digest getDigest() {
+        return digest;
+    }
+
+    @Override
+    public Manifest setDigest(Digest digest) {
+        this.digest = digest;
+        return this;
+    }
 }

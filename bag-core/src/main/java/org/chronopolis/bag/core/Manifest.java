@@ -6,4 +6,11 @@ package org.chronopolis.bag.core;
  */
 public interface Manifest extends TagFile {
 
+    final String SUFFIX = ".txt";
+    final String TAG_NAME = "tagmanifest-";
+    final String PAYLOAD_NAME = "manifest-";
+
+    Digest getDigest();
+    Manifest setDigest(Digest digest);
+
 }
