@@ -34,6 +34,8 @@ public abstract class Writer {
     public abstract Writer withPayloadDirectory(Path directory);
 
     public abstract Writer withPayloadManifest(PayloadManifest manifest);
+
+    @Deprecated
     public abstract Writer preserveManifest(boolean preserve);
 
     public abstract List<Bag> write();

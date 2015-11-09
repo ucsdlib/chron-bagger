@@ -3,11 +3,11 @@ package org.chronopolis.bag.writer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
-
 import org.chronopolis.bag.core.Bag;
 import org.chronopolis.bag.core.BagInfo;
 import org.chronopolis.bag.core.BagIt;
 import org.chronopolis.bag.core.Digest;
+import org.chronopolis.bag.core.Manifest;
 import org.chronopolis.bag.core.PayloadFile;
 import org.chronopolis.bag.core.PayloadManifest;
 import org.chronopolis.bag.core.TagFile;
@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -32,19 +31,13 @@ public class SimpleWriter extends Writer {
     private final Logger log = LoggerFactory.getLogger(SimpleWriter.class);
 
     // Things to help us when writing files
-    private Unit maxSize;
     private Digest digest;
     private boolean validate;
     private Packager packager;
-    private boolean preserveManifest;
     private NamingSchema namingSchema;
 
     // Metainformation and the actual files we will be writing
-    private BagInfo bagInfo;
-    private BagIt bagIt;
-    private PayloadManifest manifest;
-    private TagManifest tagManifest;
-    private List<TagFile> tags;
+    private Bag b;
 
     // Payload files... TODO: set
     private List<Path> payloadDirectories;
@@ -53,15 +46,10 @@ public class SimpleWriter extends Writer {
     public SimpleWriter() {
         super();
 
-        // TODO: Set defaults for all
+        b = new Bag();
+        b.setTagManifest(new TagManifest());
+        validate = true;
         digest = Digest.SHA_256;
-        validate = false;
-        preserveManifest = false;
-        this.bagIt = new BagIt();
-        this.tags = new ArrayList<>();
-        this.payloadFiles = new ArrayList<>();
-        this.payloadDirectories = new ArrayList<>();
-        this.tagManifest = new TagManifest();
     }
 
     @Override
@@ -78,7 +66,7 @@ public class SimpleWriter extends Writer {
 
     @Override
     public Writer withMaxSize(Unit maxSize) {
-        this.maxSize = maxSize;
+        log.error("SimpleWriter only creates a single bag, ignoring MaxSize setting");
         return this;
     }
 
@@ -96,30 +84,31 @@ public class SimpleWriter extends Writer {
 
     @Override
     public Writer withBagIt(BagIt bagIt) {
-        this.bagIt = bagIt;
+        b.addTag(bagIt);
         return this;
     }
 
     @Override
     public Writer withTagFile(TagFile file) {
-        tags.add(file);
+        b.addTag(file);
         return this;
     }
 
     @Override
     public Writer withBagInfo(BagInfo bagInfo) {
-        this.bagInfo = bagInfo;
+        b.addTag(bagInfo);
         return this;
     }
 
     @Override
     public Writer withPayloadFile(PayloadFile file) {
-        payloadFiles.add(file);
+        b.addFile(file);
         return this;
     }
 
     public Writer withPayloadFiles(Set<PayloadFile> files) {
-        payloadFiles.addAll(files);
+        log.debug("Adding payload files to bag {}", files);
+        b.addFiles(files);
         return this;
     }
 
@@ -136,29 +125,28 @@ public class SimpleWriter extends Writer {
 
     @Override
     public Writer withPayloadManifest(PayloadManifest manifest) {
-        this.manifest = manifest;
+        b.setManifest(manifest);
         withPayloadFiles(manifest.getFiles());
         return this;
     }
 
     @Override
     public Writer preserveManifest(boolean preserve) {
-        this.preserveManifest = preserve;
         return this;
     }
 
     @Override
     public List<Bag> write() {
-        Bag b = new Bag();
         HashCode hashCode;
         HashFunction hash = digest.getHashFunction();
         log.info("Starting build for {}", namingSchema.getName(0));
         packager.startBuild(namingSchema.getName(0));
+        TagManifest tagManifest = b.getTagManifest();
 
         // Write payload files
         // Validate if wanted
         log.trace("Writing payload files");
-        for (PayloadFile payloadFile : payloadFiles) {
+        for (PayloadFile payloadFile : b.getFiles()) {
             log.trace(payloadFile.getFile() + ": ");
             hashCode = packager.writePayloadFile(payloadFile, hash);
             log.trace(hashCode.toString());
@@ -176,28 +164,14 @@ public class SimpleWriter extends Writer {
 
         // Write manifest
         log.trace("Writing manifest:");
+        Manifest manifest = b.getManifest();
         hashCode = packager.writeManifest(manifest, hash);
         tagManifest.addTagFile(manifest.getPath(), hashCode);
-        b.setManifest(manifest);
         log.trace("HashCode is: %s\n", hashCode.toString());
 
-        // Write bag-info
-        log.trace("Writing bag-info:");
-        hashCode = packager.writeTagFile(bagInfo, hash);
-        tagManifest.addTagFile(bagInfo.getPath(), hashCode);
-        b.addTag(bagInfo);
-        log.trace("HashCode is: %s\n", hashCode.toString());
-
-        // Write bagit
-        log.trace("Writing bagit:");
-        hashCode = packager.writeTagFile(bagIt, hash);
-        tagManifest.addTagFile(bagIt.getPath(), hashCode);
-        b.addTag(bagIt);
-        log.trace("HashCode is: %s\n", hashCode.toString());
-
-        // Write extra tag files
+        // Write tag files
         log.trace("Writing tag files:");
-        for (TagFile tag : tags) {
+        for (TagFile tag : b.getTags()) {
             log.trace("{}", tag.getPath());
             hashCode = packager.writeTagFile(tag, hash);
             tagManifest.addTagFile(tag.getPath(), hashCode);
@@ -208,7 +182,7 @@ public class SimpleWriter extends Writer {
         // Write the tagmanifest
         log.trace("\nWriting tagmanifest:");
         hashCode = packager.writeManifest(tagManifest, hash);
-        b.setTagManifest(tagManifest);
+        b.setReceipt(hashCode.toString());
         log.trace("HashCode is: %s\n", hashCode.toString());
 
         packager.finishBuild();
@@ -219,4 +193,5 @@ public class SimpleWriter extends Writer {
     public List<Future<Bag>> writeAsync() {
         throw new RuntimeException("Not supported");
     }
+
 }

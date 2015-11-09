@@ -32,6 +32,7 @@ public class PayloadManifest implements Manifest {
     private PipedOutputStream os;
 
     public PayloadManifest() {
+        // Use a LinkedHashSet to preserve ordering of the manifest
         this.files = Sets.newLinkedHashSet();
         this.is = new PipedInputStream();
         this.os = new PipedOutputStream();
