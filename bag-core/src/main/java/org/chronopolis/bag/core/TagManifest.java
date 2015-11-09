@@ -52,7 +52,7 @@ public class TagManifest implements Manifest {
 
     @Override
     public Path getPath() {
-        return Paths.get(TAG_NAME, digest.getBagFormattedName(), SUFFIX);
+        return Paths.get(TAG_NAME + digest.getBagFormattedName() + SUFFIX);
     }
 
     // TODO: lazyify this

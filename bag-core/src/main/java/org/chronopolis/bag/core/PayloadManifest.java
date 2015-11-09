@@ -90,7 +90,7 @@ public class PayloadManifest implements Manifest {
 
     @Override
     public Path getPath() {
-        return Paths.get(PAYLOAD_NAME, digest.getBagFormattedName(), SUFFIX);
+        return Paths.get(PAYLOAD_NAME + digest.getBagFormattedName() + SUFFIX);
     }
 
     @Override
