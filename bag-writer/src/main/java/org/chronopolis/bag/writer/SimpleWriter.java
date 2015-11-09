@@ -47,9 +47,9 @@ public class SimpleWriter extends Writer {
         super();
 
         b = new Bag();
-        b.setTagManifest(new TagManifest());
         validate = true;
         digest = Digest.SHA_256;
+        b.setTagManifest(new TagManifest());
     }
 
     @Override
@@ -155,7 +155,7 @@ public class SimpleWriter extends Writer {
                 if (!hashCode.equals(payloadFile.getDigest())) {
                     log.error("Digest mismatch for file {}. Expected {}; Found {}",
                             new Object[] {payloadFile, payloadFile.getDigest(), hashCode});
-                    // TODO: Save error to bag
+                    b.addError(payloadFile);
                 }
             }
 

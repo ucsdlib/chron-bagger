@@ -13,6 +13,7 @@ public class Bag {
     private String name;
 
     // Some metadata
+    // TODO: Keep info about tag files as well?
     private long size = 0;
     private long numFiles = 0;
 
@@ -27,8 +28,10 @@ public class Bag {
     private TagManifest tagManifest;
     private PayloadManifest manifest;
 
-    // Receipt after building
+    // Post building/validation things
     private String receipt;
+    private boolean valid;
+    private Set<PayloadFile> errors = new HashSet<>();
 
     public String getName() {
 		return name;
@@ -124,8 +127,8 @@ public class Bag {
     /**
      * Set a receipt for the bag to use after building has completed
      *
-     * @param receipt
-     * @return
+     * @param receipt the bags receipt
+     * @return the bag object
      */
 	public Bag setReceipt(String receipt) {
 		this.receipt = receipt;
@@ -139,4 +142,29 @@ public class Bag {
 
         this.files.addAll(files);
     }
+
+    /**
+     * Return any files which could not be validated with their checksum
+     *
+     * @return error'd PayloadFiles
+     */
+    public Set<PayloadFile> getErrors() {
+        return errors;
+    }
+
+    public Bag addError(PayloadFile error) {
+        this.errors.add(error);
+        this.valid = false;
+        return this;
+    }
+
+    public boolean isValid() {
+        return valid;
+    }
+
+    public Bag setValid(boolean valid) {
+        this.valid = valid;
+        return this;
+    }
+
 }
