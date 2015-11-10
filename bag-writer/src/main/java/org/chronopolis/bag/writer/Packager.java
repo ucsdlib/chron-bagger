@@ -6,6 +6,14 @@ import org.chronopolis.bag.core.Manifest;
 import org.chronopolis.bag.core.PayloadFile;
 import org.chronopolis.bag.core.TagFile;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
+
 /**
  * Interface describing the actual writing of bags to an output stream
  *
@@ -52,5 +60,28 @@ public interface Packager {
      * @return the digest of the payload file
      */
     HashCode writePayloadFile(PayloadFile payloadFile, HashFunction function);
+
+    default void transfer(InputStream is, OutputStream os) throws IOException {
+        ReadableByteChannel inch = Channels.newChannel(is);
+        WritableByteChannel wrch = Channels.newChannel(os);
+
+        // 1MB, might want to make this configurable
+        ByteBuffer buffer = ByteBuffer.allocateDirect(32768);
+        while (inch.read(buffer) != -1) {
+            buffer.flip();
+            wrch.write(buffer);
+            buffer.compact();
+        }
+
+        buffer.flip();
+        if (buffer.hasRemaining()) {
+            wrch.write(buffer);
+        }
+
+        inch.close();
+        wrch.close();
+        is.close();
+        os.close();
+    }
 
 }

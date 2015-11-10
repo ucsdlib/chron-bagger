@@ -12,10 +12,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -49,8 +45,8 @@ public class DirectoryPackager implements Packager {
     }
 
     @Override
+    // TODO: Optional?
     public HashCode writeTagFile(TagFile tagFile, HashFunction function) {
-        HashingOutputStream hos = null;
         // tagFile.getName() or tagFile.getPath()
         // "sub/dir/name" not really the name
         // "sub/dir/name" is a path
@@ -63,13 +59,11 @@ public class DirectoryPackager implements Packager {
             log.error("Error writing TagFile {}", tag, e);
         }
 
-        return hos.hash();
+        return null;
     }
 
     @Override
     public HashCode writeManifest(Manifest manifest, HashFunction function) {
-        HashingOutputStream hos = null;
-
         Path tag = output.resolve(manifest.getPath());
         try {
             return writeFile(tag, function, manifest.getInputStream());
@@ -77,7 +71,7 @@ public class DirectoryPackager implements Packager {
             log.error("Error writing Manifest {}", tag, e);
         }
 
-        return hos.hash();
+        return null;
     }
 
     @Override
@@ -90,18 +84,16 @@ public class DirectoryPackager implements Packager {
             log.error("Error creating directories for {}", payload, e);
         }
 
-        HashingOutputStream hos = null;
-
         try {
             return writeFile(payload, function, payloadFile.getInputStream());
         } catch (IOException e) {
             log.error("Error writing PayloadFile {}", payload, e);
         }
 
-        return hos.hash();
+        return null;
     }
 
-    private HashCode writeFile(Path out, HashFunction function, InputStream is) throws IOException {
+    protected HashCode writeFile(Path out, HashFunction function, InputStream is) throws IOException {
         OutputStream os = Files.newOutputStream(out, StandardOpenOption.CREATE);
         HashingOutputStream hos = new HashingOutputStream(function, os);
         transfer(is, hos);
@@ -109,6 +101,7 @@ public class DirectoryPackager implements Packager {
     }
 
     // TODO: move up to Packager
+    /*
     private void transfer(InputStream is, OutputStream os) throws IOException {
         ReadableByteChannel inch = Channels.newChannel(is);
         WritableByteChannel wrch = Channels.newChannel(os);
@@ -131,5 +124,6 @@ public class DirectoryPackager implements Packager {
         is.close();
         os.close();
     }
+    */
 
 }
