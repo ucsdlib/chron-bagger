@@ -23,7 +23,6 @@ import java.util.concurrent.Future;
 
 /**
  * Basic implementation of a Writer
- * TODO: Make the bag the unit of work, instead of adding files to it
  *
  * Created by shake on 8/6/2015.
  */
@@ -41,7 +40,6 @@ public class SimpleWriter extends Writer {
 
     // Payload files... TODO: set
     private List<Path> payloadDirectories;
-    private List<PayloadFile> payloadFiles;
 
     public SimpleWriter() {
         super();
@@ -49,6 +47,8 @@ public class SimpleWriter extends Writer {
         b = new Bag();
         validate = true;
         digest = Digest.SHA_256;
+
+        // Create defaults for the bag
         b.setTagManifest(new TagManifest());
     }
 
