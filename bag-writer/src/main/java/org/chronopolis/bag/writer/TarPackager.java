@@ -65,6 +65,7 @@ public class TarPackager implements Packager {
         try {
             outputStream.close();
         } catch (IOException e) {
+            log.error("Error closing Tar OutputStream", e);
         }
     }
 
@@ -98,6 +99,7 @@ public class TarPackager implements Packager {
             outputStream.closeArchiveEntry();
         } catch (IOException e) {
             log.error("Error writing TarArchiveEntry {}", path, e);
+            return null;
         }
 
         return his.hash();
@@ -105,8 +107,7 @@ public class TarPackager implements Packager {
 
     private Path getTarPath(Path relPath) {
         Path root = Paths.get(name + "/");
-        Path path = root.resolve(relPath);
-        return path;
+        return root.resolve(relPath);
     }
 
     /**
@@ -118,9 +119,9 @@ public class TarPackager implements Packager {
      * @return
      * @throws IOException
      */
-    private long transfer(InputStream is, OutputStream os) throws IOException {
+    @Override
+    public void transfer(InputStream is, OutputStream os) throws IOException {
         long written = 0;
-        // TODO: Channels... or at least nio lols...
         ReadableByteChannel inch = Channels.newChannel(is);
         WritableByteChannel wrch = Channels.newChannel(os);
 
@@ -139,10 +140,7 @@ public class TarPackager implements Packager {
         }
 
         inch.close();
-        // wrch.close();
         is.close();
-        // os.close();
-        return written;
     }
 
 }
