@@ -40,7 +40,6 @@ public class OnDiskTagFile implements TagFile {
         try {
             return Files.newInputStream(tag);
         } catch (IOException e) {
-            System.out.println("fuuuuuuuuuuuck in tagfile");
             log.error("Error while getting OnDiskTagFile InputStream for {}", tag, e);
             return null;
         }
