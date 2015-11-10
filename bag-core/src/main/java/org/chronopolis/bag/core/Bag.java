@@ -30,7 +30,6 @@ public class Bag {
 
     // Post building/validation things
     private String receipt;
-    private boolean valid;
     private Set<PayloadFile> errors = new HashSet<>();
 
     public String getName() {
@@ -45,7 +44,7 @@ public class Bag {
 	/**
 	 * Return the size of the bags payload directory
 	 *
-	 * @return
+	 * @return size of the bag
      */
 	public long getSize() {
 		return size;
@@ -154,17 +153,11 @@ public class Bag {
 
     public Bag addError(PayloadFile error) {
         this.errors.add(error);
-        this.valid = false;
         return this;
     }
 
     public boolean isValid() {
-        return valid;
-    }
-
-    public Bag setValid(boolean valid) {
-        this.valid = valid;
-        return this;
+        return errors.isEmpty();
     }
 
 }
