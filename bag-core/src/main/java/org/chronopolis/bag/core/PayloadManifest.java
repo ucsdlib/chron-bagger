@@ -53,6 +53,7 @@ public class PayloadManifest implements Manifest {
                 String hash = split[0];
                 String path = split[1];
 
+                // TODO: Inject data directory
                 PayloadFile payload = new PayloadFile();
                 payload.setFile(path);
                 payload.setDigest(hash);
