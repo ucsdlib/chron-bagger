@@ -16,7 +16,7 @@ public enum Unit {
     private final double size;
 
     Unit(int exp) {
-        this.size = Math.pow(1024, exp);
+        this.size = Math.pow(1000, exp);
     }
 
     public double size() {
