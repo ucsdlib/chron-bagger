@@ -18,7 +18,7 @@ public abstract class Writer {
 
     public abstract Writer validate(boolean validate);
     public abstract Writer withDigest(Digest digest);
-    public abstract Writer withMaxSize(Unit maxSize);
+    public abstract Writer withMaxSize(int size, Unit unit);
     public abstract Writer withNamingSchema(NamingSchema namingSchema);
 
     // tar/dir/zip

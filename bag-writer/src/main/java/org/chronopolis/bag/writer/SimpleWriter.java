@@ -30,16 +30,16 @@ public class SimpleWriter extends Writer {
     private final Logger log = LoggerFactory.getLogger(SimpleWriter.class);
 
     // Things to help us when writing files
-    private Digest digest;
-    private boolean validate;
-    private Packager packager;
-    private NamingSchema namingSchema;
+    protected Digest digest;
+    protected boolean validate;
+    protected Packager packager;
+    protected NamingSchema namingSchema;
 
     // Metainformation and the actual files we will be writing
-    private Bag b;
+    protected Bag b;
 
     // Payload files... TODO: set
-    private List<Path> payloadDirectories;
+    protected List<Path> payloadDirectories;
 
     public SimpleWriter() {
         super();
@@ -65,7 +65,7 @@ public class SimpleWriter extends Writer {
     }
 
     @Override
-    public Writer withMaxSize(Unit maxSize) {
+    public Writer withMaxSize(int size, Unit unit) {
         log.error("SimpleWriter only creates a single bag, ignoring MaxSize setting");
         return this;
     }
