@@ -68,27 +68,7 @@ public class InPlaceDirectoryPackager extends DirectoryPackager {
 
     @Override
     public HashCode writeManifest(Manifest manifest, HashFunction function) {
-        HashingOutputStream hos = null;
-
-        Path tag = base.resolve(manifest.getPath());
-        String errorText = null;
-
-        HashCode hash = null;
-        try {
-            if (tag.toFile().exists()) {
-                errorText = "Error hashing TagFile {}";
-                log.debug("TagFile {} already exists, only hashing", tag);
-                hash = Files.hash(tag.toFile(), function);
-            } else {
-                errorText = "Error writing TagFile {}";
-                log.debug("TagFile {} not found, creating", tag);
-                hash = writeFile(tag, function, manifest.getInputStream());
-            }
-        } catch (IOException e) {
-            log.error(errorText, tag, e);
-        }
-
-        return hash;
+        return writeTagFile(manifest, function);
     }
 
     @Override

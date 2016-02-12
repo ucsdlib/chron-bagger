@@ -41,7 +41,7 @@ public class DirectoryPackager implements Packager {
 
     @Override
     public void finishBuild() {
-
+        this.output = null;
     }
 
     @Override
