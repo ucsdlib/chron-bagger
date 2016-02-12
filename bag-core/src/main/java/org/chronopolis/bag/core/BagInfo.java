@@ -78,8 +78,6 @@ public class BagInfo implements TagFile {
 
     public BagInfo() {
         this.path = Paths.get("bag-info.txt");
-        is = new PipedInputStream();
-        os = new PipedOutputStream();
     }
 
     public BagInfo withInfo(Tag identifier, String value) {
@@ -108,6 +106,9 @@ public class BagInfo implements TagFile {
 
     @Override
     public InputStream getInputStream() {
+        is = new PipedInputStream();
+        os = new PipedOutputStream();
+
         try {
             is.connect(os);
             // TODO: TagWriter which allows only 80 characters per line

@@ -34,8 +34,6 @@ public class BagIt implements TagFile {
 
     public BagIt() {
         this.path = Paths.get("bagit.txt");
-        this.is = new PipedInputStream();
-        this.os = new PipedOutputStream();
         this.tags = ImmutableSet.of(BAGIT_VERSION, CRLF, TAG_CHARSET);
     }
 
@@ -56,6 +54,9 @@ public class BagIt implements TagFile {
 
     @Override
     public InputStream getInputStream() {
+        is = new PipedInputStream();
+        os = new PipedOutputStream();
+
         try {
             is.connect(os);
             for (String tag : tags) {

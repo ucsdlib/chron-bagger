@@ -32,6 +32,11 @@ public class Bag {
     private String receipt;
     private Set<PayloadFile> errors = new HashSet<>();
 
+	public Bag() {
+        this.tags = new HashSet<>();
+		this.tagManifest = new TagManifest();
+	}
+
     public String getName() {
 		return name;
 	}
