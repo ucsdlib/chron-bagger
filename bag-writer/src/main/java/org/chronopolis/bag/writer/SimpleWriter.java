@@ -49,7 +49,7 @@ public class SimpleWriter extends Writer {
         digest = Digest.SHA_256;
 
         // Create defaults for the bag
-        b.setTagManifest(new TagManifest());
+        // b.setTagManifest(new TagManifest());
     }
 
     @Override
@@ -137,18 +137,23 @@ public class SimpleWriter extends Writer {
 
     @Override
     public List<Bag> write() {
+        writeBag(b, 0);
+        return ImmutableList.<Bag>of(b);
+    }
+
+    protected void writeBag(Bag bag, int num) {
         HashCode hashCode;
         HashFunction hash = digest.getHashFunction();
-        String name = namingSchema.getName(0);
+        String name = namingSchema.getName(num);
         log.info("Starting build for {}", name);
-        b.setName(name);
+        bag.setName(name);
         packager.startBuild(name);
-        TagManifest tagManifest = b.getTagManifest();
+        TagManifest tagManifest = bag.getTagManifest();
 
         // Write payload files
         // Validate if wanted
         log.trace("Writing payload files");
-        for (PayloadFile payloadFile : b.getFiles()) {
+        for (PayloadFile payloadFile : bag.getFiles()) {
             log.trace(payloadFile.getFile() + ": ");
             hashCode = packager.writePayloadFile(payloadFile, hash);
             log.trace(hashCode.toString());
@@ -157,38 +162,37 @@ public class SimpleWriter extends Writer {
                 if (!hashCode.equals(payloadFile.getDigest())) {
                     log.error("Digest mismatch for file {}. Expected {}; Found {}",
                             new Object[] {payloadFile, payloadFile.getDigest(), hashCode});
-                    b.addError(payloadFile);
+                    bag.addError(payloadFile);
                 }
             }
 
-            b.addFile(payloadFile);
+            bag.addFile(payloadFile);
         }
 
         // Write manifest
         log.trace("Writing manifest:");
-        Manifest manifest = b.getManifest();
+        Manifest manifest = bag.getManifest();
         hashCode = packager.writeManifest(manifest, hash);
         tagManifest.addTagFile(manifest.getPath(), hashCode);
         log.trace("HashCode is: %s\n", hashCode.toString());
 
         // Write tag files
         log.trace("Writing tag files:");
-        for (TagFile tag : b.getTags()) {
+        for (TagFile tag : bag.getTags()) {
             log.trace("{}", tag.getPath());
             hashCode = packager.writeTagFile(tag, hash);
             tagManifest.addTagFile(tag.getPath(), hashCode);
-            b.addTag(tag);
+            bag.addTag(tag);
             log.trace("HashCode is: %s", hashCode.toString());
         }
 
         // Write the tagmanifest
         log.trace("\nWriting tagmanifest:");
         hashCode = packager.writeManifest(tagManifest, hash);
-        b.setReceipt(hashCode.toString());
+        bag.setReceipt(hashCode.toString());
         log.trace("HashCode is: %s\n", hashCode.toString());
 
         packager.finishBuild();
-        return ImmutableList.<Bag>of(b);
     }
 
     @Override
