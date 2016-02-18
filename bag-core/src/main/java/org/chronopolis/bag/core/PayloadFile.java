@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 public class PayloadFile {
 
     private static final Logger log = LoggerFactory.getLogger(PayloadFile.class);
+    private static final String DATA_DIR = "data/";
 
     private Path file;
     private Path origin;
@@ -30,11 +31,16 @@ public class PayloadFile {
     }
 
     public void setFile(Path file) {
+        // TODO: Strip leading /
+        if (!file.startsWith(DATA_DIR)) {
+            file = Paths.get(DATA_DIR, file.toString());
+        }
+
         this.file = file;
     }
 
     public void setFile(String file) {
-        this.file = Paths.get(file);
+        setFile(Paths.get(file));
     }
 
     public HashCode getDigest() {
