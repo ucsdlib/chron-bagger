@@ -1,5 +1,8 @@
 package org.chronopolis.bag.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
@@ -12,6 +15,7 @@ import java.util.Set;
  * Created by shake on 7/29/15.
  */
 public class Bag {
+    private final Logger log = LoggerFactory.getLogger(Bag.class);
 
 	// Used as the base directory
     private String name;
@@ -111,11 +115,10 @@ public class Bag {
         if (size < bytey) {
             return String.format("%s B", size);
         }
-
         // The natural log will show us how many digits we have
         // floor(log2(x)) = 63 - numberOfLeadingZeros(x)
-        // div by bytey for our exp (K/M/G/...)
-        int exp = (63 - Long.numberOfLeadingZeros(size)) / bytey;
+        // div by 10 for our exp (K/M/G/...)
+        int exp = (63 - Long.numberOfLeadingZeros(size)) / 10;
 
         return String.format("%.1f %sB", size / Math.pow(bytey, exp), "KMGTP".charAt(exp - 1));
     }
