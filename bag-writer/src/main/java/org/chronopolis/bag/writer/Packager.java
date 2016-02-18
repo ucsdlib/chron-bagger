@@ -78,6 +78,7 @@ public interface Packager {
             wrch.write(buffer);
         }
 
+        buffer.clear();
         inch.close();
         wrch.close();
         is.close();

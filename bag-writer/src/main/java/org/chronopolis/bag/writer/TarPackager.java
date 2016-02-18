@@ -139,6 +139,7 @@ public class TarPackager implements Packager {
             wrch.write(buffer);
         }
 
+        buffer.clear();
         inch.close();
         is.close();
     }
