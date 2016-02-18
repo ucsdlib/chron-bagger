@@ -152,7 +152,7 @@ public class SimpleWriter extends Writer {
 
         // Write payload files
         // Validate if wanted
-        log.trace("Writing payload files");
+        log.info("Writing payload files");
         for (PayloadFile payloadFile : bag.getFiles()) {
             log.trace(payloadFile.getFile() + ": ");
             hashCode = packager.writePayloadFile(payloadFile, hash);
@@ -170,27 +170,27 @@ public class SimpleWriter extends Writer {
         }
 
         // Write manifest
-        log.trace("Writing manifest:");
+        log.info("Writing manifest:");
         Manifest manifest = bag.getManifest();
         hashCode = packager.writeManifest(manifest, hash);
         tagManifest.addTagFile(manifest.getPath(), hashCode);
-        log.trace("HashCode is: %s\n", hashCode.toString());
+        log.debug("HashCode is: %s\n", hashCode.toString());
 
         // Write tag files
-        log.trace("Writing tag files:");
+        log.info("Writing tag files:");
         for (TagFile tag : bag.getTags()) {
             log.trace("{}", tag.getPath());
             hashCode = packager.writeTagFile(tag, hash);
             tagManifest.addTagFile(tag.getPath(), hashCode);
             bag.addTag(tag);
-            log.trace("HashCode is: %s", hashCode.toString());
+            log.debug("HashCode is: %s", hashCode.toString());
         }
 
         // Write the tagmanifest
-        log.trace("\nWriting tagmanifest:");
+        log.info("Writing tagmanifest:");
         hashCode = packager.writeManifest(tagManifest, hash);
         bag.setReceipt(hashCode.toString());
-        log.trace("HashCode is: %s\n", hashCode.toString());
+        log.debug("HashCode is: %s\n", hashCode.toString());
 
         packager.finishBuild();
     }

@@ -16,7 +16,7 @@ import java.nio.file.Paths;
  */
 public class PayloadFile {
 
-    private final Logger log = LoggerFactory.getLogger(PayloadFile.class);
+    private static final Logger log = LoggerFactory.getLogger(PayloadFile.class);
 
     private Path file;
     private Path origin;
@@ -63,7 +63,7 @@ public class PayloadFile {
     }
 
     public String toString() {
-        return file.toString();
+        return digest.toString() + "  " + file + "\n";
     }
 
     public void setOrigin(Path origin) {
