@@ -96,7 +96,7 @@ public class SimpleWriter extends Writer {
 
     @Override
     public Writer withBagInfo(BagInfo bagInfo) {
-        b.addTag(bagInfo);
+        b.setInfo(bagInfo);
         return this;
     }
 
@@ -137,8 +137,9 @@ public class SimpleWriter extends Writer {
 
     @Override
     public List<Bag> write() {
+        b.prepareForWrite();
         writeBag(b, 0);
-        return ImmutableList.<Bag>of(b);
+        return ImmutableList.of(b);
     }
 
     protected void writeBag(Bag bag, int num) {

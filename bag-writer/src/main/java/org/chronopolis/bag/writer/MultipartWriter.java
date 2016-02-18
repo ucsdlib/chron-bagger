@@ -1,7 +1,5 @@
 package org.chronopolis.bag.writer;
 
-import com.google.common.hash.HashCode;
-import com.google.common.hash.HashFunction;
 import org.chronopolis.bag.core.Bag;
 import org.chronopolis.bag.core.PayloadFile;
 import org.chronopolis.bag.core.PayloadManifest;
@@ -36,11 +34,12 @@ public class MultipartWriter extends SimpleWriter {
     }
 
     public List<Bag> write() {
-        HashCode hashCode;
-        HashFunction hash = digest.getHashFunction();
         preprocess();
         int idx = 0;
+        int total = bags.size();
         for (Bag bag : bags) {
+            bag.setGroupTotal(total);
+            bag.prepareForWrite();
             writeBag(bag, idx);
             idx++;
         }
@@ -66,10 +65,10 @@ public class MultipartWriter extends SimpleWriter {
             currentManifest.addPayloadFile(file);
 
             if (current.getSize() > max) {
-                log.info("Completed bag {} (sizeof={})", idx++, current.getSize());
-                current.setManifest(currentManifest);
-                current.setTags(b.getTags());
+                finishProcessing(current, currentManifest, idx);
                 bags.add(current);
+
+                log.info("Completed bag {} (sizeof={})", idx++, current.getSize());
 
                 current = new Bag();
                 currentManifest = new PayloadManifest();
@@ -77,8 +76,14 @@ public class MultipartWriter extends SimpleWriter {
         }
 
         // Close out the final bag
-        current.setManifest(currentManifest);
-        current.setTags(b.getTags());
+        finishProcessing(current, currentManifest, idx);
+    }
+
+    private void finishProcessing(Bag bag, PayloadManifest manifest, int idx) {
+        bag.setNumber(idx);
+        bag.setTags(b.getTags());
+        bag.setInfo(b.getInfo().clone());
+        bag.setManifest(manifest);
     }
 
 }

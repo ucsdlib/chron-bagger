@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -63,18 +64,6 @@ public class BagInfo implements TagFile {
      */
     private Multimap<Tag, String> tags = ArrayListMultimap.create();
 
-    /**
-     * InputStream for writing tags
-     *
-     */
-    private PipedInputStream is;
-
-    /**
-     * Output stream connected to the InputStream
-     *
-     */
-    private PipedOutputStream os;
-
 
     public BagInfo() {
         this.path = Paths.get("bag-info.txt");
@@ -83,6 +72,17 @@ public class BagInfo implements TagFile {
     public BagInfo withInfo(Tag identifier, String value) {
         tags.put(identifier, value);
         return this;
+    }
+
+    @Override
+    public BagInfo clone() {
+        BagInfo clone = new BagInfo();
+        clone.tags.putAll(tags);
+        return clone;
+    }
+
+    public Collection<String> getInfo(Tag identifier) {
+        return tags.get(identifier);
     }
 
     @Override
@@ -106,8 +106,10 @@ public class BagInfo implements TagFile {
 
     @Override
     public InputStream getInputStream() {
-        is = new PipedInputStream();
-        os = new PipedOutputStream();
+        // InputStream for writing tags
+        PipedInputStream is = new PipedInputStream();
+        // Output stream connected to the InputStream
+        PipedOutputStream os = new PipedOutputStream();
 
         try {
             is.connect(os);

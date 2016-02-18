@@ -9,8 +9,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
@@ -34,17 +32,12 @@ public class PayloadManifest implements Manifest {
     private Set<PayloadFile> files;
     private Digest digest;
 
-    private PipedInputStream is;
-    private PipedOutputStream os;
-
     public PayloadManifest() {
         // default
         this.digest = Digest.SHA_256;
 
         // Use a LinkedHashSet to preserve ordering of the manifest
         this.files = Sets.newLinkedHashSet();
-        this.is = new PipedInputStream();
-        this.os = new PipedOutputStream();
     }
 
     public static PayloadManifest loadFromStream(InputStream is, Path base) {

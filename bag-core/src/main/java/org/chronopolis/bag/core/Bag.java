@@ -1,7 +1,10 @@
 package org.chronopolis.bag.core;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -13,18 +16,17 @@ public class Bag {
 	// Used as the base directory
     private String name;
 
-    // Some metadata
-    // TODO: Keep info about tag files as well?
+    // Used for the PayloadOxum
     private long size = 0;
     private long numFiles = 0;
 
-    private int number;
-    private int groupTotal;
-    private String groupId;
-    private Date baggingDate;
+    // Used for the BagCount
+    private int number = 0;
+    private int groupTotal = 0;
 
     // Tag files
-    // TODO: Separate fields for BagIt/BagInfo?
+    // TODO: Separate fields for BagIt?
+    private BagInfo info = new BagInfo();
     private Set<TagFile> tags;
 
     // Payload files
@@ -42,6 +44,29 @@ public class Bag {
         this.tags = new HashSet<>();
 		this.tagManifest = new TagManifest();
 	}
+
+    public void prepareForWrite() {
+        // Ensure these are all up to date
+        setBaggingDate(LocalDate.now());
+
+        // Set our payload oxum and size
+        info.withInfo(BagInfo.Tag.INFO_PAYLOAD_OXUM, getPayloadOxum())
+            .withInfo(BagInfo.Tag.INFO_BAG_SIZE, getFormattedSize());
+
+        // Set group info if necessary
+        if (getGroupTotal() > 1) {
+            String bagCount = (getNumber() + 1) + " of " + getGroupTotal();
+            getInfo().withInfo(BagInfo.Tag.INFO_BAG_COUNT, bagCount);
+        }
+
+        // Set group id if necessary
+        if (getGroupId() != null && !getGroupId().isEmpty()) {
+            getInfo().withInfo(BagInfo.Tag.INFO_BAG_GROUP_IDENTIFIER, getGroupId());
+        }
+
+        // Add the BagInfo to our tag files
+        addTag(info);
+    }
 
     public String getName() {
 		return name;
@@ -82,7 +107,17 @@ public class Bag {
     }
 
     public String getFormattedSize() {
-        return null;
+        int bytey = 1000;
+        if (size < bytey) {
+            return String.format("%s B", size);
+        }
+
+        // The natural log will show us how many digits we have
+        // floor(log2(x)) = 63 - numberOfLeadingZeros(x)
+        // div by bytey for our exp (K/M/G/...)
+        int exp = (63 - Long.numberOfLeadingZeros(size)) / bytey;
+
+        return String.format("%.1f %sB", size / Math.pow(bytey, exp), "KMGTP".charAt(exp - 1));
     }
 
 	public Set<TagFile> getTags() {
@@ -160,6 +195,9 @@ public class Bag {
             this.files = new HashSet<>();
         }
 
+        // update our sizes
+        numFiles += files.size();
+        files.forEach(x -> this.size += x.getSize());
         this.files.addAll(files);
     }
 
@@ -181,6 +219,9 @@ public class Bag {
         return errors.isEmpty();
     }
 
+    // Because the BagInfo only contains the string "x of n"
+    // we need to keep track of these here and upate the BagInfo
+    // when being written
     public int getNumber() {
         return number;
     }
@@ -199,21 +240,46 @@ public class Bag {
         return this;
     }
 
+
+    // Setters for fields kept within the BagInfo
+
     public String getGroupId() {
-        return groupId;
+        Collection<String> groupIds = info.getInfo(BagInfo.Tag.INFO_BAG_GROUP_IDENTIFIER);
+        if (groupIds.isEmpty()) {
+            return null;
+        }
+
+        Optional<String> first = groupIds.stream().findFirst();
+        return first.orElse("");
     }
 
     public Bag setGroupId(String groupId) {
-        this.groupId = groupId;
+        info.withInfo(BagInfo.Tag.INFO_BAG_GROUP_IDENTIFIER, groupId);
         return this;
     }
 
-    public Date getBaggingDate() {
-        return baggingDate;
+    public LocalDate getBaggingDate() {
+        Collection<String> dates = info.getInfo(BagInfo.Tag.INFO_BAGGING_DATE);
+        if (dates.isEmpty()) {
+            // We'll figure out something better to return
+            return null;
+        }
+
+        return LocalDate.now();
     }
 
-    public Bag setBaggingDate(Date baggingDate) {
-        this.baggingDate = baggingDate;
+    public Bag setBaggingDate(LocalDate baggingDate) {
+        String formattedDate = baggingDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        info.withInfo(BagInfo.Tag.INFO_BAGGING_DATE, formattedDate);
+        return this;
+    }
+
+    public BagInfo getInfo() {
+        return info;
+    }
+
+    public Bag setInfo(BagInfo info) {
+        this.info = info;
         return this;
     }
 
