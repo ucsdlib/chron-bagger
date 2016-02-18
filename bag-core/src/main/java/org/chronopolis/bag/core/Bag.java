@@ -1,5 +1,6 @@
 package org.chronopolis.bag.core;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,6 +17,11 @@ public class Bag {
     // TODO: Keep info about tag files as well?
     private long size = 0;
     private long numFiles = 0;
+
+    private int number;
+    private int groupTotal;
+    private String groupId;
+    private Date baggingDate;
 
     // Tag files
     // TODO: Separate fields for BagIt/BagInfo?
@@ -68,6 +74,16 @@ public class Bag {
 		this.numFiles = numFiles;
         return this;
 	}
+
+    public String getPayloadOxum() {
+        return String.valueOf(size) +
+                "." +
+                numFiles;
+    }
+
+    public String getFormattedSize() {
+        return null;
+    }
 
 	public Set<TagFile> getTags() {
 		return tags;
@@ -163,6 +179,42 @@ public class Bag {
 
     public boolean isValid() {
         return errors.isEmpty();
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    public Bag setNumber(int number) {
+        this.number = number;
+        return this;
+    }
+
+    public int getGroupTotal() {
+        return groupTotal;
+    }
+
+    public Bag setGroupTotal(int groupTotal) {
+        this.groupTotal = groupTotal;
+        return this;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public Bag setGroupId(String groupId) {
+        this.groupId = groupId;
+        return this;
+    }
+
+    public Date getBaggingDate() {
+        return baggingDate;
+    }
+
+    public Bag setBaggingDate(Date baggingDate) {
+        this.baggingDate = baggingDate;
+        return this;
     }
 
 }
