@@ -9,7 +9,6 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.chronopolis</groupId>
     <artifactId>bag-core</artifactId>
     <name>Bagging Core Components</name>
     <version>1.0-SNAPSHOT</version>
