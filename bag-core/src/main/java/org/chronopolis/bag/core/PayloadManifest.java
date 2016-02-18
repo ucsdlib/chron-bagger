@@ -1,6 +1,7 @@
 package org.chronopolis.bag.core;
 
 import com.google.common.collect.Sets;
+import org.chronopolis.bag.core.support.PayloadInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,11 @@ public class PayloadManifest implements Manifest {
 
     private static final int MAX_SPLIT = 2;
 
+    // Set -> Store
+    // Store interface { add, get, etc }
+    // HashStore
+    // SqliteStore
+    // ...
     private Set<PayloadFile> files;
     private Digest digest;
 
@@ -48,6 +54,7 @@ public class PayloadManifest implements Manifest {
 
         String line;
         try {
+            log.info("Reading payload manifest");
             while ((line = reader.readLine()) != null) {
                 String[] split = line.split("\\s+", MAX_SPLIT);
                 String hash = split[0];
@@ -58,7 +65,7 @@ public class PayloadManifest implements Manifest {
                 payload.setFile(path);
                 payload.setDigest(hash);
                 payload.setOrigin(base.resolve(path));
-                log.info("Adding payload file {}", path);
+                log.trace("Adding payload file {}", path);
 
                 manifest.addPayloadFile(payload);
             }
@@ -95,20 +102,9 @@ public class PayloadManifest implements Manifest {
     }
 
     @Override
-    // TODO: lazyify this
     public InputStream getInputStream() {
-        try {
-            is.connect(os);
-            for (PayloadFile file : files) {
-                String line = file.getDigest().toString() + "  " + file.getFile().toString() + "\n";
-                os.write(line.getBytes());
-            }
-            os.close();
-        } catch (IOException e) {
-            log.error("Error while writing payload manifest {}", e);
-        }
-
-        return is;
+        // TODO: Once this happens, convert the payload files to an immutable set?
+        return new PayloadInputStream(files);
     }
 
     @Override
