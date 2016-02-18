@@ -56,27 +56,30 @@ public class MultipartWriter extends SimpleWriter {
 
         Set<PayloadFile> files = b.getFiles();
         int idx = 0;
+        boolean closed = false;
 
         Bag current = new Bag();
         PayloadManifest currentManifest = new PayloadManifest();
 
         for (PayloadFile file : files) {
+            closed = false;
             current.addFile(file);
             currentManifest.addPayloadFile(file);
 
             if (current.getSize() > max) {
-                finishProcessing(current, currentManifest, idx);
-                bags.add(current);
+                finishProcessing(current, currentManifest, idx++);
 
-                log.info("Completed bag {} (sizeof={})", idx++, current.getSize());
-
+                closed = true;
                 current = new Bag();
                 currentManifest = new PayloadManifest();
             }
         }
 
+        log.info("count {} size {}", closed, files.size());
         // Close out the final bag
-        finishProcessing(current, currentManifest, idx);
+        if (!closed) {
+            finishProcessing(current, currentManifest, idx);
+        }
     }
 
     private void finishProcessing(Bag bag, PayloadManifest manifest, int idx) {
@@ -84,6 +87,9 @@ public class MultipartWriter extends SimpleWriter {
         bag.setTags(b.getTags());
         bag.setInfo(b.getInfo().clone());
         bag.setManifest(manifest);
+        bags.add(bag);
+
+        log.info("Completed bag {} (sizeof={})", idx, bag.getSize());
     }
 
 }

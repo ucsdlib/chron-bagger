@@ -66,7 +66,7 @@ public class SimpleWriter extends Writer {
 
     @Override
     public Writer withMaxSize(int size, Unit unit) {
-        log.error("SimpleWriter only creates a single bag, ignoring MaxSize setting");
+        log.warn("SimpleWriter only creates a single bag, ignoring MaxSize setting");
         return this;
     }
 
