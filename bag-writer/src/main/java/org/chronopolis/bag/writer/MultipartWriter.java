@@ -20,7 +20,7 @@ public class MultipartWriter extends SimpleWriter {
     private final Logger log = LoggerFactory.getLogger(MultipartWriter.class);
 
     private double max;
-    private List<Bag> bags;
+    protected List<Bag> bags;
 
     public MultipartWriter() {
         super();
@@ -40,7 +40,11 @@ public class MultipartWriter extends SimpleWriter {
         for (Bag bag : bags) {
             bag.setGroupTotal(total);
             bag.prepareForWrite();
-            writeBag(bag, idx);
+
+            String name = namingSchema.getName(idx);
+            bag.setName(name);
+
+            writeBag(bag);
             idx++;
         }
 
@@ -51,7 +55,7 @@ public class MultipartWriter extends SimpleWriter {
      * Create buckets for our PayloadFiles so we can split them
      *
      */
-    private void preprocess() {
+    protected void preprocess() {
         log.info("Processing files. Max size is {} bytes", max);
 
         Set<PayloadFile> files = b.getFiles();

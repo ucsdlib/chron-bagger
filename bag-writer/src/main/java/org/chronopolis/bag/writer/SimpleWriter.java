@@ -138,17 +138,17 @@ public class SimpleWriter extends Writer {
     @Override
     public List<Bag> write() {
         b.prepareForWrite();
-        writeBag(b, 0);
+        String name = namingSchema.getName(0);
+        b.setName(name);
+        writeBag(b);
         return ImmutableList.of(b);
     }
 
-    protected void writeBag(Bag bag, int num) {
+    protected void writeBag(Bag bag) {
         HashCode hashCode;
         HashFunction hash = digest.getHashFunction();
-        String name = namingSchema.getName(num);
-        log.info("Starting build for {}", name);
-        bag.setName(name);
-        packager.startBuild(name);
+        log.info("Starting build for {}", bag.getName());
+        packager.startBuild(bag.getName());
         TagManifest tagManifest = bag.getTagManifest();
 
         // Write payload files
