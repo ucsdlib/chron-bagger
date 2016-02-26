@@ -175,7 +175,7 @@ public class SimpleWriter extends Writer {
         Manifest manifest = bag.getManifest();
         hashCode = packager.writeManifest(manifest, hash);
         tagManifest.addTagFile(manifest.getPath(), hashCode);
-        log.debug("HashCode is: %s\n", hashCode.toString());
+        log.debug("HashCode is: {}\n", hashCode.toString());
 
         // Write tag files
         log.info("Writing tag files:");
@@ -184,14 +184,14 @@ public class SimpleWriter extends Writer {
             hashCode = packager.writeTagFile(tag, hash);
             tagManifest.addTagFile(tag.getPath(), hashCode);
             bag.addTag(tag);
-            log.debug("HashCode is: %s", hashCode.toString());
+            log.debug("HashCode is: {}", hashCode.toString());
         }
 
         // Write the tagmanifest
         log.info("Writing tagmanifest:");
         hashCode = packager.writeManifest(tagManifest, hash);
         bag.setReceipt(hashCode.toString());
-        log.debug("HashCode is: %s\n", hashCode.toString());
+        log.debug("HashCode is: {}\n", hashCode.toString());
 
         packager.finishBuild();
     }
