@@ -107,7 +107,7 @@ public class SimpleWriter extends Writer {
     }
 
     public Writer withPayloadFiles(Set<PayloadFile> files) {
-        log.debug("Adding payload files to bag {}", files);
+        log.debug("Adding payload files to bag ({})", files.size());
         b.addFiles(files);
         return this;
     }
