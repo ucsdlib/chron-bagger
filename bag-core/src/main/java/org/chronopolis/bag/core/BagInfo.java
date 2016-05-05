@@ -19,7 +19,7 @@ import java.util.Map;
  * <p/>
  * Created by shake on 7/29/15.
  */
-public class BagInfo implements TagFile, Comparable<BagInfo> {
+public class BagInfo implements TagFile {
 
     // Constants
     public enum Tag {
@@ -127,27 +127,19 @@ public class BagInfo implements TagFile, Comparable<BagInfo> {
     }
 
     @Override
-    public int compareTo(BagInfo bagInfo) {
-        if (this.equals(bagInfo)) {
-            return 0;
-        }
-
-        return this.hashCode() - bagInfo.hashCode();
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
         BagInfo bagInfo = (BagInfo) o;
 
-        return path != null ? path.equals(bagInfo.path) : bagInfo.path == null;
+        return tags != null ? tags.equals(bagInfo.tags) : bagInfo.tags == null;
 
     }
 
     @Override
     public int hashCode() {
-        return path != null ? path.hashCode() : 0;
+        return tags != null ? tags.hashCode() : 0;
     }
+
 }
