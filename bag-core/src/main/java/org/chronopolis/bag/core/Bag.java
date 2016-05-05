@@ -128,7 +128,11 @@ public class Bag {
 	}
 
 	public Bag setTags(Set<TagFile> tags) {
-		this.tags = tags;
+        if (this.tags == null) {
+            this.tags = new HashSet<>();
+        }
+
+        this.tags.addAll(tags);
         return this;
 	}
 
@@ -136,7 +140,8 @@ public class Bag {
         if (tags == null) {
             tags = new HashSet<>();
         }
-		this.tags.add(tag);
+
+        this.tags.add(tag);
         return this;
 	}
     
