@@ -179,8 +179,8 @@ public class SimpleWriter extends Writer {
 
         // Write tag files
         log.info("Writing tag files:");
-        for (TagFile tag : bag.getTags()) {
-            log.trace("{}", tag.getPath());
+        for (TagFile tag : bag.getTags().values()) {
+            log.debug("{}", tag.getPath());
             hashCode = packager.writeTagFile(tag, hash);
             tagManifest.addTagFile(tag.getPath(), hashCode);
             bag.addTag(tag);

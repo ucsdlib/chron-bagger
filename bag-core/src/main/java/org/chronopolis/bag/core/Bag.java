@@ -3,10 +3,13 @@ package org.chronopolis.bag.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -31,9 +34,10 @@ public class Bag {
     // Tag files
     // TODO: Separate fields for BagIt?
     private BagInfo info = new BagInfo();
-    private Set<TagFile> tags;
+    private Map<Path, TagFile> tags;
 
     // Payload files
+    // Todo: Map<Path, PayloadFile>
     private Set<PayloadFile> files;
 
     // Our two manifests
@@ -45,7 +49,7 @@ public class Bag {
     private Set<PayloadFile> errors = new HashSet<>();
 
 	public Bag() {
-        this.tags = new HashSet<>();
+        this.tags = new HashMap<>();
 		this.tagManifest = new TagManifest();
 	}
 
@@ -123,25 +127,25 @@ public class Bag {
         return String.format("%.1f %sB", size / Math.pow(bytey, exp), "KMGTP".charAt(exp - 1));
     }
 
-	public Set<TagFile> getTags() {
+	public Map<Path, TagFile> getTags() {
 		return tags;
 	}
 
-	public Bag setTags(Set<TagFile> tags) {
+	public Bag setTags(Map<Path, TagFile> tags) {
         if (this.tags == null) {
-            this.tags = new HashSet<>();
+            this.tags = new HashMap<>();
         }
 
-        this.tags.addAll(tags);
+        this.tags.putAll(tags);
         return this;
 	}
 
 	public Bag addTag(TagFile tag) {
         if (tags == null) {
-            tags = new HashSet<>();
+            tags = new HashMap<>();
         }
 
-        this.tags.add(tag);
+        this.tags.put(tag.getPath(), tag);
         return this;
 	}
     
