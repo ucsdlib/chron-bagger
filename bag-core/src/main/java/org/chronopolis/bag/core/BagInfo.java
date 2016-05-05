@@ -11,8 +11,6 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Map;
 
@@ -23,7 +21,7 @@ import java.util.Map;
  */
 public class BagInfo implements TagFile {
 
-    // Constants
+   // Constants
     public enum Tag {
 
         INFO_SOURCE_ORGANIZATION("Source-Organization"),
@@ -55,7 +53,6 @@ public class BagInfo implements TagFile {
 
     // Possibly use JodaTime instead
     private final Logger log = LoggerFactory.getLogger(BagInfo.class);
-    public static DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private final Path path;
 
     /**
@@ -128,4 +125,21 @@ public class BagInfo implements TagFile {
         }
         return is;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BagInfo bagInfo = (BagInfo) o;
+
+        return tags != null ? tags.equals(bagInfo.tags) : bagInfo.tags == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return path.hashCode();
+    }
+
 }
