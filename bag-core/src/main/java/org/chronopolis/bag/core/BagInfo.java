@@ -19,9 +19,9 @@ import java.util.Map;
  * <p/>
  * Created by shake on 7/29/15.
  */
-public class BagInfo implements TagFile {
+public class BagInfo implements TagFile, Comparable<BagInfo> {
 
-   // Constants
+    // Constants
     public enum Tag {
 
         INFO_SOURCE_ORGANIZATION("Source-Organization"),
@@ -127,19 +127,27 @@ public class BagInfo implements TagFile {
     }
 
     @Override
+    public int compareTo(BagInfo bagInfo) {
+        if (this.equals(bagInfo)) {
+            return 0;
+        }
+
+        return this.hashCode() - bagInfo.hashCode();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
         BagInfo bagInfo = (BagInfo) o;
 
-        return tags != null ? tags.equals(bagInfo.tags) : bagInfo.tags == null;
+        return path != null ? path.equals(bagInfo.path) : bagInfo.path == null;
 
     }
 
     @Override
     public int hashCode() {
-        return path.hashCode();
+        return path != null ? path.hashCode() : 0;
     }
-
 }
