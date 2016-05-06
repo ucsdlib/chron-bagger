@@ -1,5 +1,6 @@
 package org.chronopolis.bag.core;
 
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,7 @@ public class Bag {
 
     // Payload files
     // Todo: Map<Path, PayloadFile>
-    private Set<PayloadFile> files;
+    private Map<Path, PayloadFile> files;
 
     // Our two manifests
     private TagManifest tagManifest;
@@ -131,12 +132,18 @@ public class Bag {
 		return tags;
 	}
 
+    /**
+     * Replaces all current tag files with a copy of those found in tags
+     *
+     * @param tags the tag files to replace with
+     * @return this bag
+     */
 	public Bag setTags(Map<Path, TagFile> tags) {
         if (this.tags == null) {
             this.tags = new HashMap<>();
         }
 
-        this.tags.putAll(tags);
+        this.tags = Maps.newHashMap(tags);
         return this;
 	}
 
@@ -149,21 +156,27 @@ public class Bag {
         return this;
 	}
     
-	public Set<PayloadFile> getFiles() {
+	public Map<Path, PayloadFile> getFiles() {
 		return files;
 	}
 
-	public Bag setFiles(Set<PayloadFile> files) {
-		this.files = files;
+    /**
+     * Replaces all payload files with a copy of the map passed in
+     *
+     * @param files the payload files to replace with
+     * @return this bag
+     */
+	public Bag setFiles(Map<Path, PayloadFile> files) {
+		this.files = Maps.newHashMap(files);
         return this;
 	}
 
     public Bag addFile(PayloadFile file) { 
         if (files == null) {
-            files = new HashSet<>();
+            files = new HashMap<>();
         }
 
-        this.files.add(file);
+        this.files.put(file.getFile(), file);
         this.numFiles++;
         this.size += file.getSize();
         return this;
@@ -202,15 +215,15 @@ public class Bag {
         return this;
 	}
 
-    public void addFiles(Set<PayloadFile> files) {
+    public void addFiles(Map<Path, PayloadFile> files) {
         if (this.files == null) {
-            this.files = new HashSet<>();
+            this.files = new HashMap<>();
         }
 
         // update our sizes
         numFiles += files.size();
-        files.forEach(x -> this.size += x.getSize());
-        this.files.addAll(files);
+        files.values().forEach(x -> this.size += x.getSize());
+        this.files.putAll(files);
     }
 
     /**

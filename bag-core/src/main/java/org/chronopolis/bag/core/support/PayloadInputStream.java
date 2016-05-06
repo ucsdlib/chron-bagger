@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
-import java.util.Set;
 
 /**
  *
@@ -31,10 +30,10 @@ public class PayloadInputStream extends InputStream {
     }
 
     ByteBuffer current;
-    Set<PayloadFile> files;
+    Iterable<PayloadFile> files;
     Iterator<PayloadFile> it;
 
-    public PayloadInputStream(Set<PayloadFile> files) {
+    public PayloadInputStream(Iterable<PayloadFile> files) {
         this.files = files;
         it = files.iterator();
     }

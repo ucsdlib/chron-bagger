@@ -1,6 +1,6 @@
 package org.chronopolis.bag.core;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Maps;
 import org.chronopolis.bag.core.support.PayloadInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +11,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * Flickering in the blue light
@@ -29,15 +29,15 @@ public class PayloadManifest implements Manifest {
     // HashStore
     // SqliteStore
     // ...
-    private Set<PayloadFile> files;
+    private Map<Path, PayloadFile> files;
     private Digest digest;
 
     public PayloadManifest() {
         // default
         this.digest = Digest.SHA_256;
 
-        // Use a LinkedHashSet to preserve ordering of the manifest
-        this.files = Sets.newLinkedHashSet();
+        // Use a LinkedHashMap to preserve ordering of the manifest
+        this.files = Maps.newLinkedHashMap();
     }
 
     public static PayloadManifest loadFromStream(InputStream is, Path base) {
@@ -70,10 +70,10 @@ public class PayloadManifest implements Manifest {
 
     public void addPayloadFile(PayloadFile file) {
         log.trace("Adding payload file {}", file.getFile());
-        files.add(file);
+        files.put(file.getFile(), file);
     }
 
-    public Set<PayloadFile> getFiles() {
+    public Map<Path, PayloadFile> getFiles() {
         return files;
     }
 
@@ -81,7 +81,7 @@ public class PayloadManifest implements Manifest {
     public long getSize() {
         // TODO: Can memoize this
         long size = 0;
-        for (PayloadFile file : files) {
+        for (PayloadFile file : files.values()) {
             String line = file.getDigest().toString() + "  " + file.getFile().toString() + "\n";
             size += line.length();
         }
@@ -96,7 +96,7 @@ public class PayloadManifest implements Manifest {
     @Override
     public InputStream getInputStream() {
         // TODO: Once this happens, convert the payload files to an immutable set?
-        return new PayloadInputStream(files);
+        return new PayloadInputStream(files.values());
     }
 
     @Override

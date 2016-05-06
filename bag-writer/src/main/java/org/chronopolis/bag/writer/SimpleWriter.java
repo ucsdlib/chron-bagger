@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.Future;
 
 /**
@@ -106,7 +106,7 @@ public class SimpleWriter extends Writer {
         return this;
     }
 
-    public Writer withPayloadFiles(Set<PayloadFile> files) {
+    private Writer withPayloadFiles(Map<Path, PayloadFile> files) {
         log.debug("Adding payload files to bag ({})", files.size());
         b.addFiles(files);
         return this;
@@ -154,7 +154,7 @@ public class SimpleWriter extends Writer {
         // Write payload files
         // Validate if wanted
         log.info("Writing payload files");
-        for (PayloadFile payloadFile : bag.getFiles()) {
+        for (PayloadFile payloadFile : bag.getFiles().values()) {
             log.trace(payloadFile.getFile() + ": ");
             hashCode = packager.writePayloadFile(payloadFile, hash);
             log.trace(hashCode.toString());
