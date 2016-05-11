@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
+ * TODO: Should we have a notion of a closed bag and an open bag?
  *
  * Created by shake on 7/29/15.
  */
