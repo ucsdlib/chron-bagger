@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Create bags using a limit
@@ -58,14 +57,13 @@ public class MultipartWriter extends SimpleWriter {
     protected void preprocess() {
         log.info("Processing files. Max size is {} bytes", max);
 
-        Set<PayloadFile> files = b.getFiles();
         int idx = 0;
         boolean closed = false;
 
         Bag current = new Bag();
         PayloadManifest currentManifest = new PayloadManifest();
 
-        for (PayloadFile file : files) {
+        for (PayloadFile file : b.getFiles().values()) {
             closed = false;
             current.addFile(file);
             currentManifest.addPayloadFile(file);
@@ -79,7 +77,6 @@ public class MultipartWriter extends SimpleWriter {
             }
         }
 
-        log.info("count {} size {}", closed, files.size());
         // Close out the final bag
         if (!closed) {
             finishProcessing(current, currentManifest, idx);
