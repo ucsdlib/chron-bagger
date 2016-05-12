@@ -118,8 +118,8 @@ public class BagTest {
 
         // Test the error conditions
         b.addError(testFile);
-        Assert.assertEquals(true, b.getErrors().contains(testFile));
-        Assert.assertEquals(false, b.isValid());
+        Assert.assertTrue(b.getErrors().contains(testFile));
+        Assert.assertFalse( b.isValid());
     }
 
     @Test
@@ -137,11 +137,11 @@ public class BagTest {
 
         // A bit of weird way to go about it but since it's a multimap just use contains
         BagInfo info = b.getInfo();
-        Assert.assertEquals(true, info.getInfo(BagInfo.Tag.INFO_BAGGING_DATE).contains(LocalDate.now().toString()));
-        Assert.assertEquals(true, info.getInfo(BagInfo.Tag.INFO_PAYLOAD_OXUM).contains("5006.3"));
-        Assert.assertEquals(true, info.getInfo(BagInfo.Tag.INFO_BAG_SIZE).contains("5.0 KB"));
-        Assert.assertEquals(true, info.getInfo(BagInfo.Tag.INFO_BAG_COUNT).contains("1 of 2"));
-        Assert.assertEquals(true, info.getInfo(BagInfo.Tag.INFO_BAG_GROUP_IDENTIFIER).contains("test-group"));
+        Assert.assertTrue(info.getInfo(BagInfo.Tag.INFO_BAGGING_DATE).contains(LocalDate.now().toString()));
+        Assert.assertTrue(info.getInfo(BagInfo.Tag.INFO_PAYLOAD_OXUM).contains("5006.3"));
+        Assert.assertTrue(info.getInfo(BagInfo.Tag.INFO_BAG_SIZE).contains("5.0 KB"));
+        Assert.assertTrue(info.getInfo(BagInfo.Tag.INFO_BAG_COUNT).contains("1 of 2"));
+        Assert.assertTrue(info.getInfo(BagInfo.Tag.INFO_BAG_GROUP_IDENTIFIER).contains("test-group"));
     }
 
     private class TestTagFile implements TagFile {
