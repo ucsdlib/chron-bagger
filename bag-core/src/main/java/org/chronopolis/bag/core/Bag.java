@@ -169,6 +169,10 @@ public class Bag {
      */
 	public Bag setFiles(Map<Path, PayloadFile> files) {
 		this.files = Maps.newHashMap(files);
+        this.numFiles = files.size();
+        this.size = files.values().stream().reduce(0L,
+                (l, payload) -> l + payload.getSize(),
+                (l, r) -> l + r);
         return this;
 	}
 
@@ -221,10 +225,18 @@ public class Bag {
             this.files = new HashMap<>();
         }
 
-        // update our sizes
-        numFiles += files.size();
-        files.values().forEach(x -> this.size += x.getSize());
+        // We could
+        //   get the difference of the sets
+        //   add the rhs easy
+        //   compute differences in the intersection
+        // OR
+        //   just do this
         this.files.putAll(files);
+
+        // update our sizes
+        this.size = 0;
+        numFiles = this.files.size();
+        files.values().forEach(x -> this.size += x.getSize());
     }
 
     /**
@@ -269,6 +281,7 @@ public class Bag {
 
     // Setters for fields kept within the BagInfo
 
+    // TODO: Optional instead of null?
     public String getGroupId() {
         Collection<String> groupIds = info.getInfo(BagInfo.Tag.INFO_BAG_GROUP_IDENTIFIER);
         if (groupIds.isEmpty()) {
@@ -288,10 +301,10 @@ public class Bag {
         Collection<String> dates = info.getInfo(BagInfo.Tag.INFO_BAGGING_DATE);
         if (dates.isEmpty()) {
             // We'll figure out something better to return
-            return null;
+            return LocalDate.now();
         }
 
-        return LocalDate.now();
+        return LocalDate.parse(dates.iterator().next());
     }
 
     public Bag setBaggingDate(LocalDate baggingDate) {
