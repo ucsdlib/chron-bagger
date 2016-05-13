@@ -29,12 +29,10 @@ public class PayloadInputStream extends InputStream {
         return current.get();
     }
 
-    ByteBuffer current;
-    Iterable<PayloadFile> files;
-    Iterator<PayloadFile> it;
+    private ByteBuffer current;
+    private Iterator<PayloadFile> it;
 
     public PayloadInputStream(Iterable<PayloadFile> files) {
-        this.files = files;
         it = files.iterator();
     }
 
