@@ -75,4 +75,25 @@ public class PayloadFile {
     public void setOrigin(Path origin) {
         this.origin = origin;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PayloadFile that = (PayloadFile) o;
+
+        if (file != null ? !file.equals(that.file) : that.file != null) return false;
+        if (origin != null ? !origin.equals(that.origin) : that.origin != null) return false;
+        return digest != null ? digest.equals(that.digest) : that.digest == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = file != null ? file.hashCode() : 0;
+        result = 31 * result + (origin != null ? origin.hashCode() : 0);
+        result = 31 * result + (digest != null ? digest.hashCode() : 0);
+        return result;
+    }
 }
