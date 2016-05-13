@@ -109,4 +109,22 @@ public class PayloadManifest implements Manifest {
         this.digest = digest;
         return this;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PayloadManifest that = (PayloadManifest) o;
+
+        return files.equals(that.files) && digest == that.digest;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = files.hashCode();
+        result = 31 * result + digest.hashCode();
+        return result;
+    }
 }
