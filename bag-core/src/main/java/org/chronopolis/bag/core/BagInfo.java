@@ -53,7 +53,7 @@ public class BagInfo implements TagFile {
 
     // Possibly use JodaTime instead
     private final Logger log = LoggerFactory.getLogger(BagInfo.class);
-    private final Path path;
+    private final String path;
 
     /**
      * Map of the various Tags for a bag-info file
@@ -63,7 +63,7 @@ public class BagInfo implements TagFile {
 
 
     public BagInfo() {
-        this.path = Paths.get("bag-info.txt");
+        this.path = "bag-info.txt";
     }
 
     public BagInfo withInfo(Tag identifier, String value) {
@@ -129,7 +129,7 @@ public class BagInfo implements TagFile {
 
     @Override
     public Path getPath() {
-        return path;
+        return Paths.get(path);
     }
 
     @Override

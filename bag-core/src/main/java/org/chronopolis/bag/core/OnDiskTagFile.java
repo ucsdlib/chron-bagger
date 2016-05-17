@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Tag file already held on disk
@@ -16,33 +17,56 @@ import java.nio.file.Path;
 public class OnDiskTagFile implements TagFile {
     private final Logger log = LoggerFactory.getLogger(OnDiskTagFile.class);
 
-    private final Path tag;
-    private final Path normalized;
+    // Store as strings as they're easier to serialize
+    private final String tag;
+    private final String normalized;
 
     public OnDiskTagFile(Path tag) {
         // only want the relative location
-        this.tag = tag;
-        this.normalized = tag.getParent().relativize(tag);
+        this.tag = tag.toString();
+        this.normalized = tag.getParent().relativize(tag).toString();
     }
 
     @Override
     public long getSize() {
-        return tag.toFile().length();
+        return getTag().toFile().length();
     }
 
     @Override
     public Path getPath() {
-        return normalized;
+        return Paths.get(normalized);
+    }
+
+    private Path getTag() {
+        return Paths.get(tag);
     }
 
     @Override
     public InputStream getInputStream() {
         try {
-            return Files.newInputStream(tag);
+            return Files.newInputStream(getTag());
         } catch (IOException e) {
             log.error("Error while getting OnDiskTagFile InputStream for {}", tag, e);
             return null;
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        OnDiskTagFile that = (OnDiskTagFile) o;
+
+        if (tag != null ? !tag.equals(that.tag) : that.tag != null) return false;
+        return normalized != null ? normalized.equals(that.normalized) : that.normalized == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = tag != null ? tag.hashCode() : 0;
+        result = 31 * result + (normalized != null ? normalized.hashCode() : 0);
+        return result;
+    }
 }

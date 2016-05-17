@@ -18,7 +18,7 @@ import java.nio.file.Paths;
  */
 public class BagIt implements TagFile {
 
-    private final Logger log = LoggerFactory.getLogger(BagIt.class);
+    private transient final Logger log = LoggerFactory.getLogger(BagIt.class);
 
     // Do we need this? Not really... I mean... just saying...
     // private static final String BAGIT_PATH = "bagit.txt";
@@ -27,13 +27,14 @@ public class BagIt implements TagFile {
     public static final String BAGIT_VERSION = "BagIt-Version: 0.97";
     public static final String TAG_CHARSET = "Tag-File-Character-Encoding: UTF-8";
 
-    private final Path path;
+    private final String path;
     private PipedInputStream is;
     private PipedOutputStream os;
     private ImmutableSet<String> tags;
 
     public BagIt() {
-        this.path = Paths.get("bagit.txt");
+        // this.path = Paths.get("bagit.txt");
+        this.path = "bagit.txt";
         this.tags = ImmutableSet.of(BAGIT_VERSION, CRLF, TAG_CHARSET);
     }
 
@@ -49,7 +50,7 @@ public class BagIt implements TagFile {
 
     @Override
     public Path getPath() {
-        return path;
+        return Paths.get(path);
     }
 
     @Override
@@ -68,5 +69,24 @@ public class BagIt implements TagFile {
         }
 
         return is;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BagIt bagIt = (BagIt) o;
+
+        if (path != null ? !path.equals(bagIt.path) : bagIt.path != null) return false;
+        return tags != null ? tags.equals(bagIt.tags) : bagIt.tags == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = path != null ? path.hashCode() : 0;
+        result = 31 * result + (tags != null ? tags.hashCode() : 0);
+        return result;
     }
 }
