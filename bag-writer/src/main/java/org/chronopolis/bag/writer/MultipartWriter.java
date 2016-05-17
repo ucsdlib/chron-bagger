@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.chronopolis.bag.core.TagFile.copy;
+
 /**
  * Create bags using a limit
  *
@@ -60,15 +62,19 @@ public class MultipartWriter extends SimpleWriter {
         int idx = 0;
         boolean closed = false;
 
+        // TODO: Why not just clone the root bag? Then we don't need to worry about
+        //       adding all the tag files and what not
         Bag current = new Bag();
         PayloadManifest currentManifest = new PayloadManifest();
 
+        // TODO: This should fail if a file is greater than the max;
+        //       and only allow UP TO max for a bag, not over
         for (PayloadFile file : b.getFiles().values()) {
             closed = false;
             current.addFile(file);
             currentManifest.addPayloadFile(file);
 
-            if (current.getSize() > max) {
+            if (current.getSize() >= max) {
                 finishProcessing(current, currentManifest, idx++);
 
                 closed = true;
@@ -85,11 +91,15 @@ public class MultipartWriter extends SimpleWriter {
 
     private void finishProcessing(Bag bag, PayloadManifest manifest, int idx) {
         bag.setNumber(idx);
-        bag.setTags(b.getTags());
-        bag.setInfo(b.getInfo().clone());
-        bag.setManifest(manifest);
-        bags.add(bag);
 
+        // Copies of our tag files + bag info
+        b.getTags().forEach((path, tagFile) -> bag.addTag(copy(tagFile)));
+        bag.setInfo(copy(b.getInfo()));
+
+        // manifest is unique so we don't need to make a separate copy
+        bag.setManifest(manifest);
+
+        bags.add(bag);
         log.info("Completed bag {} (sizeof={})", idx, bag.getSize());
     }
 
