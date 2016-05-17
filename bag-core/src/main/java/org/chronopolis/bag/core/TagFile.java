@@ -34,10 +34,8 @@ public interface TagFile extends Serializable {
         System.out.println(orig.getClass().getName());
         try {
             // Write the object out to a byte array
-            System.out.println("Creating streams");
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ObjectOutputStream out = new ObjectOutputStream(bos);
-            System.out.println("writing to streams");
             out.writeObject(orig);
             out.flush();
             out.close();
@@ -46,9 +44,7 @@ public interface TagFile extends Serializable {
             // a copy of the object back in.
             ObjectInputStream in = new ObjectInputStream(
                     new ByteArrayInputStream(bos.toByteArray()));
-            System.out.println("reading streams");
             Object obj2 = in.readObject();
-            System.out.println(obj2.getClass().getName());
             obj = (T) obj2;
         }
         catch(IOException | ClassNotFoundException e) {
