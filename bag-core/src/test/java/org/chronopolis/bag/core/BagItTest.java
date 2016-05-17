@@ -44,4 +44,15 @@ public class BagItTest {
         Assert.assertTrue(matches);
     }
 
+    @Test
+    public void testSerialize() {
+        BagIt bagIt = new BagIt();
+        BagIt copy = TagFile.copy(bagIt);
+
+        Assert.assertFalse(bagIt == copy);
+        Assert.assertEquals(bagIt, copy);
+    }
+
+
+
 }

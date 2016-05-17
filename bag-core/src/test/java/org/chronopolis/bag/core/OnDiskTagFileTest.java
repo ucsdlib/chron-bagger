@@ -57,5 +57,13 @@ public class OnDiskTagFileTest {
     }
 
 
+    @Test
+    public void testSerialize() {
+        OnDiskTagFile copy = TagFile.copy(tag);
+
+        Assert.assertFalse(tag == copy);
+        Assert.assertEquals(tag, copy);
+    }
+
 
 }

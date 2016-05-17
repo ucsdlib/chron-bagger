@@ -70,7 +70,16 @@ public class BagInfoTest {
         Assert.assertEquals(b1.hashCode(), b2.hashCode());
         Assert.assertNotEquals(b1, b3);
         Assert.assertNotEquals(b1.hashCode(), b3.hashCode());
+    }
 
+    @Test
+    public void serialize() {
+        BagInfo info = new BagInfo();
+        info.withInfo(BagInfo.Tag.INFO_EXTERNAL_IDENTIFIER, "some-external-id");
+        BagInfo copy = TagFile.copy(info);
+
+        Assert.assertFalse(info == copy);
+        Assert.assertTrue(info.equals(copy));
     }
 
 }
