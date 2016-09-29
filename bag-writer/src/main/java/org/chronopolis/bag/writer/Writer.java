@@ -35,6 +35,9 @@ public abstract class Writer {
 
     public abstract Writer withPayloadManifest(PayloadManifest manifest);
 
+    /**
+     * @deprecated something of substance about why we don't use this
+     */
     @Deprecated
     public abstract Writer preserveManifest(boolean preserve);
 

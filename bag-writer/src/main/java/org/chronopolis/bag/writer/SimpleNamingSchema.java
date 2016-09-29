@@ -15,11 +15,11 @@ public class SimpleNamingSchema implements NamingSchema {
 
     @Override
     public String getName(int bagNumber) {
-        StringBuilder name = new StringBuilder(this.name);
+        StringBuilder nb = new StringBuilder(this.name);
         if (bagNumber > 0) {
-            name.append("-").append(bagNumber);
+            nb.append("-").append(bagNumber);
         }
 
-        return name.toString();
+        return nb.toString();
     }
 }

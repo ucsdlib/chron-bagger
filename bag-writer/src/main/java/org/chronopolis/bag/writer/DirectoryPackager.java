@@ -100,30 +100,4 @@ public class DirectoryPackager implements Packager {
         return hos.hash();
     }
 
-    // TODO: move up to Packager
-    /*
-    private void transfer(InputStream is, OutputStream os) throws IOException {
-        ReadableByteChannel inch = Channels.newChannel(is);
-        WritableByteChannel wrch = Channels.newChannel(os);
-
-        // 1MB, might want to make this configurable
-        ByteBuffer buffer = ByteBuffer.allocateDirect(32768);
-        while (inch.read(buffer) != -1) {
-            buffer.flip();
-            wrch.write(buffer);
-            buffer.compact();
-        }
-
-        buffer.flip();
-        if (buffer.hasRemaining()) {
-            wrch.write(buffer);
-        }
-
-        inch.close();
-        wrch.close();
-        is.close();
-        os.close();
-    }
-    */
-
 }

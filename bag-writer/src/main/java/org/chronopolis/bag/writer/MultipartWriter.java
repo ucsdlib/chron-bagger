@@ -34,6 +34,7 @@ public class MultipartWriter extends SimpleWriter {
         return this;
     }
 
+    @Override
     public List<Bag> write() {
         preprocess();
         int idx = 0;
@@ -67,7 +68,7 @@ public class MultipartWriter extends SimpleWriter {
         Bag current = new Bag();
         PayloadManifest currentManifest = new PayloadManifest();
 
-        // TODO: This should fail if a file is greater than the max;
+        // TODO: This should fail if a file is greater than the max
         //       and only allow UP TO max for a bag, not over
         for (PayloadFile file : b.getFiles().values()) {
             closed = false;

@@ -28,12 +28,11 @@ public class BagIt implements TagFile {
     public static final String TAG_CHARSET = "Tag-File-Character-Encoding: UTF-8";
 
     private final String path;
-    private PipedInputStream is;
-    private PipedOutputStream os;
+    private transient PipedInputStream is;
+    private transient PipedOutputStream os;
     private ImmutableSet<String> tags;
 
     public BagIt() {
-        // this.path = Paths.get("bagit.txt");
         this.path = "bagit.txt";
         this.tags = ImmutableSet.of(BAGIT_VERSION, CRLF, TAG_CHARSET);
     }

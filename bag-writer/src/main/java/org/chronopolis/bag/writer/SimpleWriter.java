@@ -49,7 +49,7 @@ public class SimpleWriter extends Writer {
         digest = Digest.SHA_256;
 
         // Create defaults for the bag
-        // b.setTagManifest(new TagManifest());
+        // b.setTagManifest(new TagManifest())?
     }
 
     @Override
@@ -159,12 +159,10 @@ public class SimpleWriter extends Writer {
             hashCode = packager.writePayloadFile(payloadFile, hash);
             log.trace(hashCode.toString());
 
-            if (validate) {
-                if (!hashCode.equals(payloadFile.getDigest())) {
-                    log.error("Digest mismatch for file {}. Expected {}; Found {}",
-                            new Object[] {payloadFile, payloadFile.getDigest(), hashCode});
-                    bag.addError(payloadFile);
-                }
+            if (validate && !hashCode.equals(payloadFile.getDigest())) {
+                log.error("Digest mismatch for file {}. Expected {}; Found {}",
+                    new Object[] {payloadFile, payloadFile.getDigest(), hashCode});
+                bag.addError(payloadFile);
             }
 
             bag.addFile(payloadFile);
@@ -198,7 +196,7 @@ public class SimpleWriter extends Writer {
 
     @Override
     public List<Future<Bag>> writeAsync() {
-        throw new RuntimeException("Not supported");
+        throw new UnsupportedOperationException("Not supported");
     }
 
 }

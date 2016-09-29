@@ -15,7 +15,7 @@ import java.nio.file.Paths;
  * Created by shake on 8/9/2015.
  */
 public class OnDiskTagFile implements TagFile {
-    private final Logger log = LoggerFactory.getLogger(OnDiskTagFile.class);
+    private transient final Logger log = LoggerFactory.getLogger(OnDiskTagFile.class);
 
     // Store as strings as they're easier to serialize
     private final String tag;

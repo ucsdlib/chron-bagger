@@ -48,6 +48,7 @@ public class PayloadManifest implements Manifest {
         String line;
         try {
             log.info("Reading payload manifest");
+            // TODO: Error checking
             while ((line = reader.readLine()) != null) {
                 String[] split = line.split("\\s+", MAX_SPLIT);
                 String hash = split[0];

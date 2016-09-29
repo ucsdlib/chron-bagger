@@ -1,5 +1,8 @@
 package org.chronopolis.bag.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -20,6 +23,7 @@ public interface TagFile extends Serializable {
     Path getPath();
 
     // TODO: default method?
+    // TODO: Move away from inputstream
     // +getTags()
     InputStream getInputStream();
 
@@ -30,8 +34,8 @@ public interface TagFile extends Serializable {
      * via: http://javatechniques.com/blog/faster-deep-copies-of-java-objects/
      */
     static<T> T copy(T orig) {
+        final Logger log = LoggerFactory.getLogger(TagFile.class);
         T obj = null;
-        System.out.println(orig.getClass().getName());
         try {
             // Write the object out to a byte array
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -48,7 +52,7 @@ public interface TagFile extends Serializable {
             obj = (T) obj2;
         }
         catch(IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            log.error("Error copying tag file", e);
         }
         return obj;
     }

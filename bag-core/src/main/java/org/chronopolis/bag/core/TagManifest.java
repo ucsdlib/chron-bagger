@@ -18,10 +18,10 @@ import java.util.Map;
  * Created by shake on 7/30/15.
  */
 public class TagManifest implements Manifest {
-    private final Logger log = LoggerFactory.getLogger(TagManifest.class);
+    private transient final Logger log = LoggerFactory.getLogger(TagManifest.class);
 
-    private PipedInputStream is;
-    private PipedOutputStream os;
+    private transient PipedInputStream is;
+    private transient PipedOutputStream os;
     private Map<Path, HashCode> files;
     private Digest digest;
 

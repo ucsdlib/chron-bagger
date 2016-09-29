@@ -112,7 +112,7 @@ public class TarPackager implements Packager {
 
     /**
      * Transfer the content of the input stream to the output stream
-     * without closing the underlying output stream
+     * without closing the underlying output stream (by calling wrch.close())
      *
      * @param is
      * @param os
@@ -121,17 +121,14 @@ public class TarPackager implements Packager {
      */
     @Override
     public void transfer(InputStream is, OutputStream os) throws IOException {
-        long written = 0;
         ReadableByteChannel inch = Channels.newChannel(is);
         WritableByteChannel wrch = Channels.newChannel(os);
 
         ByteBuffer buffer = ByteBuffer.allocateDirect(32768);
-        int nr;
-        while ((nr = inch.read(buffer)) != -1) {
+        while (inch.read(buffer) != -1) {
             buffer.flip();
             wrch.write(buffer);
             buffer.compact();
-            written += nr;
         }
 
         buffer.flip();

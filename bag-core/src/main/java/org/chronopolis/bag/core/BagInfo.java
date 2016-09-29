@@ -52,7 +52,7 @@ public class BagInfo implements TagFile {
     }
 
     // Possibly use JodaTime instead
-    private final Logger log = LoggerFactory.getLogger(BagInfo.class);
+    private transient final Logger log = LoggerFactory.getLogger(BagInfo.class);
     private final String path;
 
     /**
@@ -155,11 +155,21 @@ public class BagInfo implements TagFile {
                         .append("\r\n"); // TODO: Constant for carriage return?
                 os.write(tag.toString().getBytes());
             }
-            os.close();
         } catch (IOException e) {
             log.error("Error writing BagInfo InputStream", e);
+        } finally {
+            tryClose(os);
         }
+
         return is;
+    }
+
+    private void tryClose(PipedOutputStream os) {
+        try {
+            os.close();
+        } catch (IOException e) {
+            log.error("Could not close output stream for BagInfo", e);
+        }
     }
 
     @Override

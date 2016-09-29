@@ -31,12 +31,14 @@ public class PayloadFile {
     }
 
     public void setFile(Path file) {
-        // TODO: Strip leading /
+        Path cleaned = file;
+        // TODO: Do we just want to have everything under data/
+        //       even a directory called "data"?
         if (!file.startsWith(DATA_DIR)) {
-            file = Paths.get(DATA_DIR, file.toString());
+            cleaned = Paths.get(DATA_DIR, file.toString());
         }
 
-        this.file = file;
+        this.file = cleaned;
     }
 
     public void setFile(String file) {
@@ -56,6 +58,7 @@ public class PayloadFile {
     }
 
     public long getSize() {
+        // todo: memoize
         return origin.toFile().length();
     }
 
@@ -68,6 +71,7 @@ public class PayloadFile {
         }
     }
 
+    @Override
     public String toString() {
         return digest.toString() + "  " + file + "\n";
     }

@@ -5,7 +5,6 @@ import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -86,13 +85,6 @@ public class PayloadManifestTest {
 
         Assert.assertTrue(eq);
         Assert.assertTrue(hs);
-    }
-
-    class IOExceptionStream extends InputStream {
-        @Override
-        public int read() throws IOException {
-            throw new IOException("this is for testing only");
-        }
     }
 
 }

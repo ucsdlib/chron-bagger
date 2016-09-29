@@ -2,7 +2,6 @@ package org.chronopolis.bag.writer;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
-import com.google.common.hash.HashingOutputStream;
 import com.google.common.io.Files;
 import org.chronopolis.bag.core.Manifest;
 import org.chronopolis.bag.core.PayloadFile;
@@ -38,12 +37,11 @@ public class InPlaceDirectoryPackager extends DirectoryPackager {
 
     @Override
     public void finishBuild() {
-
+        // Nothing to do (as of now)
     }
 
     @Override
     public HashCode writeTagFile(TagFile tagFile, HashFunction function) {
-        HashingOutputStream hos = null;
         HashCode hash = null;
 
         Path tag = base.resolve(tagFile.getPath());
@@ -84,38 +82,5 @@ public class InPlaceDirectoryPackager extends DirectoryPackager {
 
         return hash;
     }
-
-    /*
-    private HashCode writeFile(Path out, HashFunction function, InputStream is) throws IOException {
-        OutputStream os = Files.newOutputStream(out, StandardOpenOption.CREATE);
-        HashingOutputStream hos = new HashingOutputStream(function, os);
-        transfer(is, hos);
-        return hos.hash();
-    }
-
-    // TODO: move up to Packager
-    private void transfer(InputStream is, OutputStream os) throws IOException {
-        ReadableByteChannel inch = Channels.newChannel(is);
-        WritableByteChannel wrch = Channels.newChannel(os);
-
-        // 1MB, might want to make this configurable
-        ByteBuffer buffer = ByteBuffer.allocateDirect(32768);
-        while (inch.read(buffer) != -1) {
-            buffer.flip();
-            wrch.write(buffer);
-            buffer.compact();
-        }
-
-        buffer.flip();
-        if (buffer.hasRemaining()) {
-            wrch.write(buffer);
-        }
-
-        inch.close();
-        wrch.close();
-        is.close();
-        os.close();
-    }
-    */
 
 }
