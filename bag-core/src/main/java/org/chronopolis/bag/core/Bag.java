@@ -48,6 +48,7 @@ public class Bag {
     // Post building/validation things
     private String receipt;
     private Set<PayloadFile> errors = new HashSet<>();
+    private Set<String> buildErrors = new HashSet<>();
 
 	public Bag() {
         this.tags = new HashMap<>();
@@ -248,13 +249,22 @@ public class Bag {
         return errors;
     }
 
+    public Set<String> getBuildErrors() {
+        return buildErrors;
+    }
+
     public Bag addError(PayloadFile error) {
         this.errors.add(error);
         return this;
     }
 
+    public Bag addBuildError(String message) {
+        this.buildErrors.add(message);
+        return this;
+    }
+
     public boolean isValid() {
-        return errors.isEmpty();
+        return errors.isEmpty() && buildErrors.isEmpty();
     }
 
     // Because the BagInfo only contains the string "x of n"
