@@ -39,7 +39,6 @@ public class Bag {
     private Map<Path, TagFile> tags;
 
     // Payload files
-    // Todo: Map<Path, PayloadFile>
     private Map<Path, PayloadFile> files;
 
     // Our two manifests
@@ -52,6 +51,7 @@ public class Bag {
 
 	public Bag() {
         this.tags = new HashMap<>();
+        this.files = new HashMap<>();
 		this.tagManifest = new TagManifest();
 	}
 
