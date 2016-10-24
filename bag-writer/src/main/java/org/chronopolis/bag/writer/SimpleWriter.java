@@ -145,11 +145,60 @@ public class SimpleWriter extends Writer {
     }
 
     protected void writeBag(Bag bag) {
-        HashCode hashCode;
         HashFunction hash = digest.getHashFunction();
+
         log.info("Starting build for {}", bag.getName());
-        packager.startBuild(bag.getName());
-        TagManifest tagManifest = bag.getTagManifest();
+        try {
+            packager.startBuild(bag.getName());
+            TagManifest tagManifest = bag.getTagManifest();
+            writePayloadFiles(bag, hash);
+            writeManifest(bag, hash, tagManifest);
+            writeTagFiles(bag, hash, tagManifest);
+            writeTagManifest(bag, hash, tagManifest);
+        } catch(Exception e) {
+            log.error("Error building bag!", e);
+        } finally {
+            packager.finishBuild();
+        }
+    }
+
+    private void writeTagManifest(Bag bag, HashFunction hash, TagManifest tagManifest) {
+        HashCode hashCode;
+
+        // Write the tagmanifest
+        log.info("Writing tagmanifest:");
+        hashCode = packager.writeManifest(tagManifest, hash);
+        bag.setReceipt(hashCode.toString());
+        log.debug("HashCode is: {}\n", hashCode.toString());
+    }
+
+    private void writeTagFiles(Bag bag, HashFunction hash, TagManifest tagManifest) {
+        HashCode hashCode;
+
+        // Write tag files
+        log.info("Writing tag files:");
+        for (TagFile tag : bag.getTags().values()) {
+            log.debug("{}", tag.getPath());
+            hashCode = packager.writeTagFile(tag, hash);
+            tagManifest.addTagFile(tag.getPath(), hashCode);
+            bag.addTag(tag);
+            log.debug("HashCode is: {}", hashCode.toString());
+        }
+    }
+
+    private void writeManifest(Bag bag, HashFunction hash, TagManifest tagManifest) {
+        HashCode hashCode;
+
+        // Write manifest
+        log.info("Writing manifest:");
+        Manifest manifest = bag.getManifest();
+        hashCode = packager.writeManifest(manifest, hash);
+        tagManifest.addTagFile(manifest.getPath(), hashCode);
+        log.debug("HashCode is: {}\n", hashCode.toString());
+    }
+
+    private void writePayloadFiles(Bag bag, HashFunction hash) {
+        HashCode hashCode;
 
         // Write payload files
         // Validate if wanted
@@ -172,31 +221,6 @@ public class SimpleWriter extends Writer {
 
             bag.addFile(payloadFile);
         }
-
-        // Write manifest
-        log.info("Writing manifest:");
-        Manifest manifest = bag.getManifest();
-        hashCode = packager.writeManifest(manifest, hash);
-        tagManifest.addTagFile(manifest.getPath(), hashCode);
-        log.debug("HashCode is: {}\n", hashCode.toString());
-
-        // Write tag files
-        log.info("Writing tag files:");
-        for (TagFile tag : bag.getTags().values()) {
-            log.debug("{}", tag.getPath());
-            hashCode = packager.writeTagFile(tag, hash);
-            tagManifest.addTagFile(tag.getPath(), hashCode);
-            bag.addTag(tag);
-            log.debug("HashCode is: {}", hashCode.toString());
-        }
-
-        // Write the tagmanifest
-        log.info("Writing tagmanifest:");
-        hashCode = packager.writeManifest(tagManifest, hash);
-        bag.setReceipt(hashCode.toString());
-        log.debug("HashCode is: {}\n", hashCode.toString());
-
-        packager.finishBuild();
     }
 
     @Override
