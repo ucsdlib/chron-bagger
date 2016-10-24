@@ -41,12 +41,10 @@ public class PayloadManifest implements Manifest {
     }
 
     public static PayloadManifest loadFromStream(InputStream is, Path base) {
-        BufferedReader reader =
-                new BufferedReader(new InputStreamReader(is));
         PayloadManifest manifest = new PayloadManifest();
 
         String line;
-        try {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
             log.info("Reading payload manifest");
             // TODO: Error checking
             while ((line = reader.readLine()) != null) {
