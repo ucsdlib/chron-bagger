@@ -154,6 +154,11 @@ public class SimpleWriter extends Writer {
         // Write payload files
         // Validate if wanted
         log.info("Writing payload files");
+        if (bag.getFiles().isEmpty()) {
+            log.warn("Bag has no payload files, marking as error");
+            bag.addBuildError("Bag has no payload files");
+        }
+
         for (PayloadFile payloadFile : bag.getFiles().values()) {
             log.trace(payloadFile.getFile() + ": ");
             hashCode = packager.writePayloadFile(payloadFile, hash);
