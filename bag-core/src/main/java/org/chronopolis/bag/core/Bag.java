@@ -28,6 +28,7 @@ public class Bag {
     // Used for the PayloadOxum
     private long size = 0;
     private long numFiles = 0;
+    private double maxSize = -1;
 
     // Used for the BagCount
     private int number = 0;
@@ -101,6 +102,15 @@ public class Bag {
 		this.size = size;
         return this;
 	}
+
+	public double getMaxSize() {
+        return maxSize;
+    }
+
+    public Bag setMaxSize(double maxSize) {
+        this.maxSize = maxSize;
+        return this;
+    }
 
 	public long getNumFiles() {
 		return numFiles;
@@ -332,4 +342,26 @@ public class Bag {
         return this;
     }
 
+    /**
+     * Try to add a file to a bag
+     * if successful, the manifest, and all metadata is updated to reflect
+     * the current state of the bag
+     *
+     * @param file the file to add
+     * @return success of adding the file
+     */
+    public boolean tryAdd(PayloadFile file) {
+        if (maxSize == -1 || file.getSize() + size < maxSize) {
+            files.put(file.getFile(), file);
+            manifest.addPayloadFile(file);
+
+            ++numFiles;
+            size += file.getSize();
+
+            return true;
+        }
+
+
+        return false;
+    }
 }
