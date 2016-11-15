@@ -55,6 +55,7 @@ public class Bag {
         this.tags = new HashMap<>();
         this.files = new HashMap<>();
 		this.tagManifest = new TagManifest();
+        this.manifest = new PayloadManifest();
 	}
 
     public void prepareForWrite() {
@@ -351,7 +352,7 @@ public class Bag {
      * @return success of adding the file
      */
     public boolean tryAdd(PayloadFile file) {
-        if (maxSize == -1 || file.getSize() + size < maxSize) {
+        if (maxSize == -1 || file.getSize() + size <= maxSize) {
             files.put(file.getFile(), file);
             manifest.addPayloadFile(file);
 
@@ -363,5 +364,9 @@ public class Bag {
 
 
         return false;
+    }
+
+    public boolean isEmpty() {
+        return files.isEmpty();
     }
 }
