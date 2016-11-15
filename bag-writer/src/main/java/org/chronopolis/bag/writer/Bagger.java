@@ -85,11 +85,10 @@ public class Bagger {
     }
 
     // Method for creating bags from what we have
-    public BaggingResult kraft() {
+    public BaggingResult partition() {
         log.info("Processing files. Max size is {} bytes", max);
 
         int idx = 0;
-        boolean closed = false;
 
         List<Bag> finished = new ArrayList<>();
         Queue<Bag> processing = new PriorityQueue<>(new SizeComparator());
@@ -109,6 +108,7 @@ public class Bagger {
     }
 
     private void updateMetadata(List<Bag> finished) {
+        tags.add(new BagIt());
         for (Bag bag : finished) {
             int idx = finished.indexOf(bag);
             tags.forEach(bag::addTag);
@@ -122,7 +122,6 @@ public class Bagger {
 
     private void add(PayloadFile file, Queue<Bag> processing, List<Bag> finished) {
         Bag current = processing.poll();
-        log.info("Polling for bag... {}", current);
 
         // Are we out of bags?
         if (current == null) {
