@@ -16,6 +16,8 @@ import java.util.Set;
 
 /**
  * TODO: Should we have a notion of a closed bag and an open bag?
+ *       Or maybe read only/some version of an immutable bag?
+ * TODO: maxFiles
  *
  * Created by shake on 7/29/15.
  */
@@ -161,11 +163,12 @@ public class Bag {
 	}
 
 	public Bag addTag(TagFile tag) {
+        TagFile copy = TagFile.copy(tag);
         if (tags == null) {
             tags = new HashMap<>();
         }
 
-        this.tags.put(tag.getPath(), tag);
+        this.tags.put(copy.getPath(), copy);
         return this;
 	}
     
