@@ -85,6 +85,12 @@ public class Bagger {
     }
 
     // Method for creating bags from what we have
+
+    /**
+     * Method to partition a given payload manifest into a set of bags
+     *
+     * @return the result of the partitioning
+     */
     public BaggingResult partition() {
         log.info("Processing files. Max size is {} bytes", max);
 
