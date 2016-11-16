@@ -77,17 +77,16 @@ public class DirectoryPackagerTest {
         });
     }
 
-    private DirectoryPackager startPackager(String test) {
-        DirectoryPackager packager = new DirectoryPackager(out);
-        packager.startBuild(test);
-        return packager;
+    private DirectoryPackager startPackager() {
+        return new DirectoryPackager(out);
     }
 
     @Test
     public void startBuild() throws Exception {
         String buildName = "packager-test";
         System.out.println("using " + out);
-        startPackager(buildName);
+        DirectoryPackager packager = startPackager();
+        packager.startBuild(buildName);
 
         Assert.assertTrue(Files.exists(out.resolve(buildName)));
         Assert.assertTrue(Files.isDirectory(out.resolve(buildName)));
@@ -97,9 +96,10 @@ public class DirectoryPackagerTest {
     public void writeTagFile() throws Exception {
         String testName = "tag-files";
         Path bag = out.resolve(testName);
-        DirectoryPackager packager = startPackager(testName);
+        DirectoryPackager packager = startPackager();
+        PackagerData packagerData = packager.startBuild(testName);
         BagIt bagIt = new BagIt();
-        HashCode hashCode = packager.writeTagFile(bagIt, func);
+        HashCode hashCode = packager.writeTagFile(bagIt, func, packagerData);
 
         Assert.assertTrue(Files.exists(bag.resolve("bagit.txt")));
         Assert.assertTrue(Files.isRegularFile(bag.resolve("bagit.txt")));
@@ -111,9 +111,10 @@ public class DirectoryPackagerTest {
         String testName = "tag-files-ioe";
 
         Path bag = out.resolve(testName);
-        DirectoryPackager packager = startPackager(testName);
+        DirectoryPackager packager = startPackager();
+        PackagerData data = packager.startBuild(testName);
         IOTagFile tag = new IOTagFile();
-        HashCode hash = packager.writeTagFile(tag, func);
+        HashCode hash = packager.writeTagFile(tag, func, data);
 
         Assert.assertNull(hash);
         // Assert.assertFalse(Files.exists(bag.resolve(tag.getPath())));
@@ -124,13 +125,14 @@ public class DirectoryPackagerTest {
         String testName = "manifest";
         Path bag = out.resolve(testName);
 
-        DirectoryPackager packager = startPackager(testName);
+        DirectoryPackager packager = startPackager();
+        PackagerData data = packager.startBuild(testName);
         PayloadManifest m = new PayloadManifest();
         m.setDigest(Digest.SHA_256);
         m.addPayloadFile(f);
 
         HashCode payload = func.hashString(f.toString(), Charset.defaultCharset());
-        HashCode pkgHash = packager.writeManifest(m, func);
+        HashCode pkgHash = packager.writeManifest(m, func, data);
         HashCode fileHash = com.google.common.io.Files.hash(bag.resolve("manifest-sha256.txt").toFile(), func);
 
         Assert.assertTrue(Files.exists(bag.resolve("manifest-sha256.txt")));
@@ -144,11 +146,11 @@ public class DirectoryPackagerTest {
     @Test
     public void writeManifestIO() throws Exception {
         String testName = "manifest-ioe";
-        Path bag = out.resolve(testName);
 
-        DirectoryPackager packager = startPackager(testName);
+        DirectoryPackager packager = startPackager();
+        PackagerData data = packager.startBuild(testName);
         Manifest m = new IOManifest();
-        HashCode hash = packager.writeManifest(m, func);
+        HashCode hash = packager.writeManifest(m, func, data);
 
         Assert.assertNull(hash);
         // Assert.assertFalse(Files.exists(bag.resolve(m.getPath())));
@@ -159,8 +161,9 @@ public class DirectoryPackagerTest {
         String testName = "payload";
         Path bag = out.resolve(testName);
 
-        DirectoryPackager packager = startPackager(testName);
-        HashCode hashCode = packager.writePayloadFile(f, func);
+        DirectoryPackager packager = startPackager();
+        PackagerData data = packager.startBuild(testName);
+        HashCode hashCode = packager.writePayloadFile(f, func, data);
 
         String tags = ClassLoader.getSystemClassLoader()
                                  .getResource("payload").getPath();
@@ -180,10 +183,11 @@ public class DirectoryPackagerTest {
         String testName = "payload-ioe";
         Path bag = out.resolve(testName);
 
-        DirectoryPackager packager = startPackager(testName);
+        DirectoryPackager packager = startPackager();
+        PackagerData data = packager.startBuild(testName);
         PayloadFile payload = new IOPayloadFile();
 
-        HashCode hash = packager.writePayloadFile(payload, func);
+        HashCode hash = packager.writePayloadFile(payload, func, data);
 
         Path fileInBag = bag.resolve(payload.getFile());
         Assert.assertNull(hash);

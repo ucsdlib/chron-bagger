@@ -25,34 +25,37 @@ public class DirectoryPackager implements Packager {
     private final Logger log = LoggerFactory.getLogger(DirectoryPackager.class);
 
     private final Path base;
-    private Path output;
 
     public DirectoryPackager(Path base) {
         this.base = base;
     }
 
     @Override
-    public void startBuild(String name) {
-        output = base.resolve(name);
+    public PackagerData startBuild(String name) {
+        PackagerData data = new PackagerData();
+        Path output = base.resolve(name);
 
         // TODO: Check if this exists first
         output.toFile().mkdirs();
+        data.setName(name);
+        data.setWrite(output);
+        return data;
     }
 
     @Override
-    public void finishBuild() {
-        this.output = null;
+    public void finishBuild(PackagerData data) {
+        // Nothing really to do
     }
 
     @Override
     // TODO: Optional?
-    public HashCode writeTagFile(TagFile tagFile, HashFunction function) {
+    public HashCode writeTagFile(TagFile tagFile, HashFunction function, PackagerData data) {
         // tagFile.getName() or tagFile.getPath()
         // "sub/dir/name" not really the name
         // "sub/dir/name" is a path
         // allows for things like the dpn-tags easily
         // probably want 1 method for transferring actual bytes/channel
-        Path tag = output.resolve(tagFile.getPath());
+        Path tag = data.getWrite().resolve(tagFile.getPath());
         try {
             return writeFile(tag, function, tagFile.getInputStream());
         } catch (IOException e) {
@@ -63,8 +66,8 @@ public class DirectoryPackager implements Packager {
     }
 
     @Override
-    public HashCode writeManifest(Manifest manifest, HashFunction function) {
-        Path tag = output.resolve(manifest.getPath());
+    public HashCode writeManifest(Manifest manifest, HashFunction function, PackagerData data) {
+        Path tag = data.getWrite().resolve(manifest.getPath());
         try {
             return writeFile(tag, function, manifest.getInputStream());
         } catch (IOException e) {
@@ -75,9 +78,9 @@ public class DirectoryPackager implements Packager {
     }
 
     @Override
-    public HashCode writePayloadFile(PayloadFile payloadFile, HashFunction function) {
+    public HashCode writePayloadFile(PayloadFile payloadFile, HashFunction function, PackagerData data) {
         // Ensure that all the directories are created first
-        Path payload = output.resolve(payloadFile.getFile());
+        Path payload = data.getWrite().resolve(payloadFile.getFile());
         try {
             Files.createDirectories(payload.getParent());
         } catch (IOException e) {

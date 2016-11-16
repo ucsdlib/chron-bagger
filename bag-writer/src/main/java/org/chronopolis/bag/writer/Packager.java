@@ -26,13 +26,13 @@ public interface Packager {
      *
      * @param bagName
      */
-    void startBuild(String bagName);
+    PackagerData startBuild(String bagName);
 
     /**
      * Finish a build
      *
      */
-    void finishBuild();
+    void finishBuild(PackagerData data);
 
     /**
      * Write a tag file to the bag
@@ -41,7 +41,7 @@ public interface Packager {
      * @param function
      * @return the digest of the tag file
      */
-    HashCode writeTagFile(TagFile tagFile, HashFunction function);
+    HashCode writeTagFile(TagFile tagFile, HashFunction function, PackagerData data);
 
     /**
      * Write the manifest file of the bag
@@ -50,7 +50,7 @@ public interface Packager {
      * @param function
      * @return the digest of the manifest
      */
-    HashCode writeManifest(Manifest manifest, HashFunction function);
+    HashCode writeManifest(Manifest manifest, HashFunction function, PackagerData data);
 
     /**
      * Write a payload file to the data directory of the bag
@@ -59,7 +59,7 @@ public interface Packager {
      * @param function
      * @return the digest of the payload file
      */
-    HashCode writePayloadFile(PayloadFile payloadFile, HashFunction function);
+    HashCode writePayloadFile(PayloadFile payloadFile, HashFunction function, PackagerData data);
 
     default void transfer(InputStream is, OutputStream os) throws IOException {
         ReadableByteChannel inch = Channels.newChannel(is);
