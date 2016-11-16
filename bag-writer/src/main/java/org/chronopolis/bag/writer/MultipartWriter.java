@@ -17,6 +17,7 @@ import static org.chronopolis.bag.core.TagFile.copy;
  *
  * Created by shake on 2/11/16.
  */
+@Deprecated
 public class MultipartWriter extends SimpleWriter {
     private final Logger log = LoggerFactory.getLogger(MultipartWriter.class);
 
@@ -63,13 +64,9 @@ public class MultipartWriter extends SimpleWriter {
         int idx = 0;
         boolean closed = false;
 
-        // TODO: Why not just clone the root bag? Then we don't need to worry about
-        //       adding all the tag files and what not
         Bag current = new Bag();
         PayloadManifest currentManifest = new PayloadManifest();
 
-        // TODO: This should fail if a file is greater than the max
-        //       and only allow UP TO max for a bag, not over
         for (PayloadFile file : b.getFiles().values()) {
             closed = false;
             current.addFile(file);
