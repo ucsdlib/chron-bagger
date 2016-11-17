@@ -1,4 +1,4 @@
-package org.chronopolis.bag.writer;
+package org.chronopolis.bag.partitioner;
 
 import com.google.common.collect.ImmutableList;
 import org.chronopolis.bag.core.Bag;
@@ -8,6 +8,8 @@ import org.chronopolis.bag.core.PayloadFile;
 import org.chronopolis.bag.core.PayloadManifest;
 import org.chronopolis.bag.core.TagFile;
 import org.chronopolis.bag.core.Unit;
+import org.chronopolis.bag.NamingSchema;
+import org.chronopolis.bag.UUIDNamingSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

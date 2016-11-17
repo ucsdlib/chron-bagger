@@ -1,6 +1,7 @@
 package org.chronopolis.bag.writer;
 
 import org.chronopolis.bag.core.Bag;
+import org.chronopolis.bag.packager.Packager;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

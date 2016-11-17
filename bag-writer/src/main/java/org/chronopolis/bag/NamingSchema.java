@@ -1,4 +1,4 @@
-package org.chronopolis.bag.writer;
+package org.chronopolis.bag;
 
 /**
  * Common interface from which we derive names

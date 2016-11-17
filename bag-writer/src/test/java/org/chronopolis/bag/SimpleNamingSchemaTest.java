@@ -1,4 +1,4 @@
-package org.chronopolis.bag.writer;
+package org.chronopolis.bag;
 
 import org.junit.Assert;
 import org.junit.Test;

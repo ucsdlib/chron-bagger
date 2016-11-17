@@ -1,4 +1,4 @@
-package org.chronopolis.bag.writer;
+package org.chronopolis.bag.partitioner;
 
 import org.chronopolis.bag.core.Bag;
 import org.chronopolis.bag.core.PayloadFile;
@@ -20,5 +20,17 @@ public class BaggingResult {
         this.success = success;
         this.bags = bags;
         this.rejected = rejected;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public List<Bag> getBags() {
+        return bags;
+    }
+
+    public List<PayloadFile> getRejected() {
+        return rejected;
     }
 }

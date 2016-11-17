@@ -1,4 +1,4 @@
-package org.chronopolis.bag.writer;
+package org.chronopolis.bag.packager;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;

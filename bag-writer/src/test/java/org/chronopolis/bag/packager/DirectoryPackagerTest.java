@@ -1,4 +1,4 @@
-package org.chronopolis.bag.writer;
+package org.chronopolis.bag.packager;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
@@ -9,6 +9,7 @@ import org.chronopolis.bag.core.Manifest;
 import org.chronopolis.bag.core.PayloadFile;
 import org.chronopolis.bag.core.PayloadManifest;
 import org.chronopolis.bag.core.TagFile;
+import org.chronopolis.bag.writer.IOExceptionStream;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

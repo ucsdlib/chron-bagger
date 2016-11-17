@@ -3,6 +3,7 @@ package org.chronopolis.bag.writer;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
+import org.chronopolis.bag.UUIDNamingSchema;
 import org.chronopolis.bag.core.Bag;
 import org.chronopolis.bag.core.BagInfo;
 import org.chronopolis.bag.core.PayloadFile;

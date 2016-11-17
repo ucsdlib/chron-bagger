@@ -1,4 +1,4 @@
-package org.chronopolis.bag.writer;
+package org.chronopolis.bag.packager;
 
 import java.io.OutputStream;
 import java.nio.file.Path;
