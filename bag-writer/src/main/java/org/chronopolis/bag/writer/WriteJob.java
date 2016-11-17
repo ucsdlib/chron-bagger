@@ -39,6 +39,8 @@ public class WriteJob implements Callable<WriteResult>, Supplier<WriteResult> {
     public WriteResult call() throws Exception {
         // Is there a better way to get this information? Maybe store it in the bag.
         result.setBag(bag);
+        // TODO: Get rid of this extraneous call
+        bag.prepareForWrite();
         HashFunction hash = bag.getManifest().getDigest().getHashFunction();
 
         log.info("Starting build for {}", bag.getName());
