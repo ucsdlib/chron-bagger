@@ -66,25 +66,25 @@ public class WriteJob implements Callable<WriteResult>, Supplier<WriteResult> {
         HashCode hashCode;
 
         // Write the tagmanifest
-        log.debug("Writing tagmanifest");
+        log.info("Writing tagmanifest for {}", bag.getName());
         hashCode = packager.writeManifest(tagManifest, hash, data);
         String receipt = hashCode.toString();
         bag.setReceipt(receipt);
         result.setReceipt(receipt);
-        log.debug("HashCode is: {}", receipt);
+        log.debug("HashCode is {}", receipt);
     }
 
     private void writeTagFiles(Bag bag, HashFunction hash, TagManifest tagManifest, PackagerData data) {
         HashCode hashCode;
 
         // Write tag files
-        log.info("Writing tag files:");
+        log.info("Writing tag files for {}", bag.getName());
         for (TagFile tag : bag.getTags().values()) {
             log.debug("{}", tag.getPath());
             hashCode = packager.writeTagFile(tag, hash, data);
             tagManifest.addTagFile(tag.getPath(), hashCode);
             bag.addTag(tag);
-            log.debug("HashCode is: {}", hashCode.toString());
+            log.debug("HashCode is {}", hashCode.toString());
         }
     }
 
@@ -92,11 +92,11 @@ public class WriteJob implements Callable<WriteResult>, Supplier<WriteResult> {
         HashCode hashCode;
 
         // Write manifest
-        log.info("Writing manifest:");
+        log.info("Writing manifest for {}", bag.getName());
         Manifest manifest = bag.getManifest();
         hashCode = packager.writeManifest(manifest, hash, data);
         tagManifest.addTagFile(manifest.getPath(), hashCode);
-        log.debug("HashCode is: {}", hashCode.toString());
+        log.debug("HashCode is {}", hashCode.toString());
     }
 
     private void writePayloadFiles(Bag bag, HashFunction hash, PackagerData data) {
@@ -104,7 +104,7 @@ public class WriteJob implements Callable<WriteResult>, Supplier<WriteResult> {
 
         // Write payload files
         // Validate if wanted
-        log.info("Writing payload files");
+        log.info("Writing payload files for {}", bag.getName());
         if (bag.getFiles().isEmpty()) {
             log.warn("Bag has no payload files, marking as error");
             bag.addBuildError("Bag has no payload files");
