@@ -12,10 +12,10 @@ import java.util.concurrent.Executor;
  *
  * Created by shake on 11/16/16.
  */
-public interface ProtoWriter {
+public interface BagWriter {
 
-    ProtoWriter validate(boolean validate);
-    ProtoWriter withPackager(Packager packager);
+    BagWriter validate(boolean validate);
+    BagWriter withPackager(Packager packager);
 
     List<CompletableFuture<WriteResult>> write(List<Bag> bags);
     List<CompletableFuture<WriteResult>> write(List<Bag> bags, Executor executor);

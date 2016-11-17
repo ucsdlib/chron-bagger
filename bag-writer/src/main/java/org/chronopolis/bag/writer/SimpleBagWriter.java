@@ -16,23 +16,23 @@ import java.util.concurrent.Executors;
  *
  * Created by shake on 11/16/16.
  */
-public class WriteManager implements ProtoWriter {
-    private final Logger log = LoggerFactory.getLogger(WriteManager.class);
+public class SimpleBagWriter implements BagWriter {
+    private final Logger log = LoggerFactory.getLogger(SimpleBagWriter.class);
 
     private boolean validate;
     private Packager packager;
 
-    public WriteManager() {
+    public SimpleBagWriter() {
     }
 
     @Override
-    public ProtoWriter validate(boolean validate) {
+    public BagWriter validate(boolean validate) {
         this.validate = validate;
         return this;
     }
 
     @Override
-    public ProtoWriter withPackager(Packager packager) {
+    public BagWriter withPackager(Packager packager) {
         this.packager = packager;
         return this;
     }
