@@ -26,17 +26,19 @@ public class WriteJob implements Callable<WriteResult>, Supplier<WriteResult> {
     private final Bag bag;
     private final boolean validate;
     private final Packager packager;
+    private WriteResult result;
 
     public WriteJob(Bag bag, boolean validate, Packager packager) {
         this.bag = bag;
         this.validate = validate;
         this.packager = packager;
+        result = new WriteResult();
     }
 
     @Override
     public WriteResult call() throws Exception {
         // Is there a better way to get this information? Maybe store it in the bag.
-        WriteResult result = new WriteResult();
+        result.setBag(bag);
         HashFunction hash = bag.getManifest().getDigest().getHashFunction();
 
         log.info("Starting build for {}", bag.getName());
@@ -49,6 +51,7 @@ public class WriteJob implements Callable<WriteResult>, Supplier<WriteResult> {
             writeTagFiles(bag, hash, tagManifest, data);
             writeTagManifest(bag, hash, tagManifest, data);
         } catch(Exception e) {
+            result.setSuccess(false);
             log.error("Error building bag!", e);
         } finally {
             packager.finishBuild(data);
@@ -61,10 +64,12 @@ public class WriteJob implements Callable<WriteResult>, Supplier<WriteResult> {
         HashCode hashCode;
 
         // Write the tagmanifest
-        log.info("Writing tagmanifest:");
+        log.debug("Writing tagmanifest");
         hashCode = packager.writeManifest(tagManifest, hash, data);
-        bag.setReceipt(hashCode.toString());
-        log.debug("HashCode is: {}", hashCode.toString());
+        String receipt = hashCode.toString();
+        bag.setReceipt(receipt);
+        result.setReceipt(receipt);
+        log.debug("HashCode is: {}", receipt);
     }
 
     private void writeTagFiles(Bag bag, HashFunction hash, TagManifest tagManifest, PackagerData data) {
@@ -111,6 +116,7 @@ public class WriteJob implements Callable<WriteResult>, Supplier<WriteResult> {
             if (validate && !hashCode.equals(payloadFile.getDigest())) {
                 log.error("Digest mismatch for file {}. Expected {}; Found {}",
                     new Object[] {payloadFile, payloadFile.getDigest(), hashCode});
+                result.setSuccess(false);
                 bag.addError(payloadFile);
             }
 
