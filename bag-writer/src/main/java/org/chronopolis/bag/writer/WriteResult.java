@@ -14,6 +14,7 @@ public class WriteResult {
     private boolean success;
 
     public WriteResult() {
+        this.success = true;
     }
 
     public Bag getBag() {
