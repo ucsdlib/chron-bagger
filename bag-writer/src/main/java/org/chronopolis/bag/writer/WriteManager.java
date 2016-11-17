@@ -1,6 +1,7 @@
 package org.chronopolis.bag.writer;
 
 import org.chronopolis.bag.core.Bag;
+import org.chronopolis.bag.packager.Packager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
@@ -19,10 +21,8 @@ public class WriteManager implements ProtoWriter {
 
     private boolean validate;
     private Packager packager;
-    private final Executor executor;
 
     public WriteManager() {
-        executor = Executors.newSingleThreadExecutor();
     }
 
     @Override
@@ -39,7 +39,12 @@ public class WriteManager implements ProtoWriter {
 
     @Override
     public List<CompletableFuture<WriteResult>> write(List<Bag> bags) {
-        return write(bags, executor);
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        try {
+            return write(bags, executor);
+        } finally {
+           executor.shutdown();
+        }
     }
 
     @Override
