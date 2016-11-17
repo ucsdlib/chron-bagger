@@ -15,6 +15,7 @@ import static org.chronopolis.bag.core.TagFile.copy;
 /**
  * Create bags using a limit
  *
+ * @deprecated will be removed... at a point in time
  * Created by shake on 2/11/16.
  */
 @Deprecated

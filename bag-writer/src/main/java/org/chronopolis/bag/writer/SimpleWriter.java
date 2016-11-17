@@ -27,6 +27,7 @@ import java.util.concurrent.Future;
 /**
  * Basic implementation of a Writer
  *
+ * @deprecated will be removed... at a point in time
  * Created by shake on 8/6/2015.
  */
 @Deprecated
