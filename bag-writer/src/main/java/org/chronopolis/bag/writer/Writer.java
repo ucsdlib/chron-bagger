@@ -1,6 +1,8 @@
 package org.chronopolis.bag.writer;
 
+import org.chronopolis.bag.NamingSchema;
 import org.chronopolis.bag.core.*;
+import org.chronopolis.bag.packager.Packager;
 
 import java.nio.file.Path;
 import java.util.List;

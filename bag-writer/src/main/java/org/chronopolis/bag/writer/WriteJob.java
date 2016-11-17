@@ -7,6 +7,8 @@ import org.chronopolis.bag.core.Manifest;
 import org.chronopolis.bag.core.PayloadFile;
 import org.chronopolis.bag.core.TagFile;
 import org.chronopolis.bag.core.TagManifest;
+import org.chronopolis.bag.packager.Packager;
+import org.chronopolis.bag.packager.PackagerData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
