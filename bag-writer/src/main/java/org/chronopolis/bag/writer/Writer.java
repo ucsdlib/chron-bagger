@@ -11,7 +11,7 @@ import java.util.concurrent.Future;
 /**
  * Main class to create bags from
  *
- * @deprecated will be removed... at a point in time
+ * @deprecated will be removed at 1.2.0-RELEASE
  * Created by shake on 7/30/2015.
  */
 @Deprecated
