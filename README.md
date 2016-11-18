@@ -1,9 +1,9 @@
 # Bagger
 
 This is a Java BagIt library that takes an opinionated view of how to create bags
-based, primarily based on experience from dealings with Duracloud and the like.
-If you don't like something, request a change or make a pull request to change something,
-there's still a lot to be updated and validated.
+based primarily based on experience from dealings with snapshots pull from Duracloud.
+There is still a bit of variance as everything gets sorted out and the regular data
+flow becomes well defined.
 
 # JavaDoc
 
@@ -20,10 +20,21 @@ through a PayloadManifest which tracks the Digest type, Digest, and PayloadFiles
 collection.
 
 ```java
-Path base = Paths.get("/path/to/manifest/");
+Path base = Paths.get("/path/to/files/");
 PayloadManifest manifest = PayloadManifest.loadFromStream(
     Files.newInputStream(base.resolve("manifest-sha256.txt"), 
     base);
+```
+
+_Note: A typical layout emulates the bagit structure_
+```
+[/path/to/files/] $ tree
+.
+├── data
+│   ├── ...
+├── extra-tag.txt
+├── manifest-md5.txt
+└── manifest-sha256.txt
 ```
 
 ### Partitioning
@@ -78,3 +89,6 @@ List<WriteResult> collect = written.stream()
 // as a precaution that all threads have joined.
 boolean writeSuccess = collect.stream().allMatch(WriteResult::isSuccess);
 ```
+
+_Note: It may also be good to convert from a `List<CompleteableFuture<WriteResult>>`
+to `CompletableFuture<List<WriteResult>>`, but this is all new so not much has been done yet_
