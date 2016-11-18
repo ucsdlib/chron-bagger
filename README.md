@@ -92,3 +92,8 @@ boolean writeSuccess = collect.stream().allMatch(WriteResult::isSuccess);
 
 _Note: It may also be good to convert from a `List<CompleteableFuture<WriteResult>>`
 to `CompletableFuture<List<WriteResult>>`, but this is all new so not much has been done yet_
+
+## Deprecated Classes
+
+Version 1.0 had partitioning and writing of bags handled through the Writer, SimpleWriter, and MultipartWriter classes.
+These have been deprecated and will be removed by the 1.2.0 release.
