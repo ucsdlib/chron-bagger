@@ -17,7 +17,7 @@ public interface BagWriter {
     BagWriter validate(boolean validate);
     BagWriter withPackager(Packager packager);
 
-    List<CompletableFuture<WriteResult>> write(List<Bag> bags);
+    List<WriteResult> write(List<Bag> bags);
     List<CompletableFuture<WriteResult>> write(List<Bag> bags, Executor executor);
 
 }

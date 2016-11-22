@@ -5,12 +5,10 @@ import org.chronopolis.bag.packager.Packager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -38,24 +36,22 @@ public class SimpleBagWriter implements BagWriter {
     }
 
     @Override
-    public List<CompletableFuture<WriteResult>> write(List<Bag> bags) {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        try {
-            return write(bags, executor);
-        } finally {
-           executor.shutdown();
-        }
+    public List<WriteResult> write(List<Bag> bags) {
+        return bags.stream()
+                .map(this::fromBag)
+                .collect(Collectors.toList());
+    }
+
+    // Just a helper so we have a clean map above
+    private WriteResult fromBag(Bag bag) {
+        WriteJob job = new WriteJob(bag, validate, packager);
+        return job.get();
     }
 
     @Override
     public List<CompletableFuture<WriteResult>> write(List<Bag> bags, Executor executor) {
-        List<CompletableFuture<WriteResult>> futures = new ArrayList<>();
-        for (Bag bag : bags) {
-            WriteJob job = new WriteJob(bag, validate, packager);
-            CompletableFuture<WriteResult> future = CompletableFuture.supplyAsync(job, executor);
-            futures.add(future);
-        }
-
-        return futures;
+        return bags.stream()
+                .map(b -> CompletableFuture.supplyAsync(new WriteJob(b, validate, packager), executor))
+                .collect(Collectors.toList());
     }
 }

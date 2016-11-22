@@ -19,6 +19,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -62,12 +64,18 @@ public class Main {
                 log.info("Partitioned bag {} (valid={}, size={}, files={})", new Object[]{bag.getName(), bag.isValid(), bag.getSize(), bag.getFiles().size()});
             }
 
-            List<CompletableFuture<WriteResult>> write = writer.write(baggingResult.getBags());
-            List<WriteResult> collect = write.stream()
+            int median = baggingResult.getBags().size()/2;
+            baggingResult.getBags().subList(0, median);
+            List<WriteResult> write = writer.write(baggingResult.getBags().subList(0, median));
+
+            ExecutorService service = Executors.newSingleThreadExecutor();
+            List<CompletableFuture<WriteResult>> async = writer.write(baggingResult.getBags().subList(median, baggingResult.getBags().size()), service);
+            List<WriteResult> asyncResult = async.stream()
                     .map(CompletableFuture::join)
                     .collect(Collectors.toList());
+            service.shutdown();
 
-            boolean writeSuccess = collect.stream().allMatch(WriteResult::isSuccess);
+            boolean writeSuccess = (write.stream().allMatch(WriteResult::isSuccess) && asyncResult.stream().allMatch(WriteResult::isSuccess));
 
             if (writeSuccess) {
                 // do work with bags
