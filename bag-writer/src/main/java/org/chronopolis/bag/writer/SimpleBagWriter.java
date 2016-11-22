@@ -37,6 +37,7 @@ public class SimpleBagWriter implements BagWriter {
 
     @Override
     public List<WriteResult> write(List<Bag> bags) {
+        checkNull(bags);
         return bags.stream()
                 .map(this::fromBag)
                 .collect(Collectors.toList());
@@ -50,8 +51,15 @@ public class SimpleBagWriter implements BagWriter {
 
     @Override
     public List<CompletableFuture<WriteResult>> write(List<Bag> bags, Executor executor) {
+        checkNull(bags);
         return bags.stream()
                 .map(b -> CompletableFuture.supplyAsync(new WriteJob(b, validate, packager), executor))
                 .collect(Collectors.toList());
+    }
+
+    private void checkNull(List<Bag> bags) {
+        if (bags == null) {
+            throw new IllegalArgumentException("Bags cannot be null");
+        }
     }
 }
