@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 
 /**
  * Class which writes bags with a given packager
- *
+ * <p>
  * Created by shake on 11/16/16.
  */
 public class WriteJob implements Callable<WriteResult>, Supplier<WriteResult> {
@@ -36,7 +36,7 @@ public class WriteJob implements Callable<WriteResult>, Supplier<WriteResult> {
     }
 
     @Override
-    public WriteResult call() throws Exception {
+    public WriteResult call() {
         // Is there a better way to get this information? Maybe store it in the bag.
         result.setBag(bag);
         // TODO: Get rid of this extraneous call
@@ -52,7 +52,7 @@ public class WriteJob implements Callable<WriteResult>, Supplier<WriteResult> {
             writeManifest(bag, hash, tagManifest, data);
             writeTagFiles(bag, hash, tagManifest, data);
             writeTagManifest(bag, hash, tagManifest, data);
-        } catch(Exception e) {
+        } catch (Exception e) {
             result.setSuccess(false);
             log.error("Error building bag!", e);
         } finally {
@@ -117,7 +117,7 @@ public class WriteJob implements Callable<WriteResult>, Supplier<WriteResult> {
 
             if (validate && !hashCode.equals(payloadFile.getDigest())) {
                 log.error("Digest mismatch for file {}. Expected {}; Found {}",
-                    new Object[] {payloadFile, payloadFile.getDigest(), hashCode});
+                        new Object[]{payloadFile, payloadFile.getDigest(), hashCode});
                 result.setSuccess(false);
                 bag.addError(payloadFile);
             }
@@ -128,10 +128,6 @@ public class WriteJob implements Callable<WriteResult>, Supplier<WriteResult> {
 
     @Override
     public WriteResult get() {
-        try {
-            return call();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return call();
     }
 }
