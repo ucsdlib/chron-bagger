@@ -48,54 +48,52 @@ public class DirectoryPackager implements Packager {
     }
 
     @Override
-    // TODO: Optional?
-    public HashCode writeTagFile(TagFile tagFile, HashFunction function, PackagerData data) {
+    public HashCode writeTagFile(TagFile tagFile, HashFunction function, PackagerData data) throws IOException {
         // tagFile.getName() or tagFile.getPath()
         // "sub/dir/name" not really the name
         // "sub/dir/name" is a path
         // allows for things like the dpn-tags easily
         // probably want 1 method for transferring actual bytes/channel
         Path tag = data.getWrite().resolve(tagFile.getPath());
-        try {
-            return writeFile(tag, function, tagFile.getInputStream());
-        } catch (IOException e) {
-            log.error("Error writing TagFile {}", tag, e);
+        try (InputStream is = tagFile.getInputStream()) {
+            return writeFile(tag, function, is);
         }
-
-        return null;
     }
 
     @Override
-    public HashCode writeManifest(Manifest manifest, HashFunction function, PackagerData data) {
+    public HashCode writeManifest(Manifest manifest, HashFunction function, PackagerData data) throws IOException {
         Path tag = data.getWrite().resolve(manifest.getPath());
-        try {
-            return writeFile(tag, function, manifest.getInputStream());
-        } catch (IOException e) {
-            log.error("Error writing Manifest {}", tag, e);
+        try (InputStream is = manifest.getInputStream()) {
+            return writeFile(tag, function, is);
         }
-
-        return null;
     }
 
     @Override
-    public HashCode writePayloadFile(PayloadFile payloadFile, HashFunction function, PackagerData data) {
+    public HashCode writePayloadFile(PayloadFile payloadFile, HashFunction function, PackagerData data) throws IOException {
         // Ensure that all the directories are created first
         Path payload = data.getWrite().resolve(payloadFile.getFile());
         try {
             Files.createDirectories(payload.getParent());
         } catch (IOException e) {
             log.error("Error creating directories for {}", payload, e);
+            throw e;
         }
 
-        try {
-            return writeFile(payload, function, payloadFile.getInputStream());
-        } catch (IOException e) {
-            log.error("Error writing PayloadFile {}", payload, e);
+        try (InputStream is = payloadFile.getInputStream()) {
+            return writeFile(payload, function, is);
         }
-
-        return null;
     }
 
+    /**
+     * Common code between all the other methods which write files
+     *
+     * @param out The path of the file we're writing to
+     * @param function The HashFunction to capture the write with
+     * @param is The InputStream we're reading from
+     * @return The HashCode of the written OutputStream
+     * @throws IOException if there's a problem writing bytes
+     */
+    @SuppressWarnings("WeakerAccess")
     protected HashCode writeFile(Path out, HashFunction function, InputStream is) throws IOException {
         OutputStream os = Files.newOutputStream(out, StandardOpenOption.CREATE);
         HashingOutputStream hos = new HashingOutputStream(function, os);

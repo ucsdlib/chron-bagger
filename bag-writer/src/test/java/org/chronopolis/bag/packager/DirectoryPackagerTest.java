@@ -107,7 +107,7 @@ public class DirectoryPackagerTest {
         Assert.assertEquals(bagitHash, hashCode.toString());
     }
 
-    @Test
+    @Test(expected = IOException.class)
     public void writeTagIO() throws Exception {
         String testName = "tag-files-ioe";
 
@@ -144,7 +144,7 @@ public class DirectoryPackagerTest {
         Assert.assertEquals(payload, fileHash);
     }
 
-    @Test
+    @Test(expected = IOException.class)
     public void writeManifestIO() throws Exception {
         String testName = "manifest-ioe";
 
@@ -179,7 +179,7 @@ public class DirectoryPackagerTest {
         Assert.assertEquals(f.getDigest(), hashCode);
     }
 
-    @Test
+    @Test(expected = IOException.class)
     public void writePayloadIO() throws Exception {
         String testName = "payload-ioe";
         Path bag = out.resolve(testName);
