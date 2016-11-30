@@ -24,7 +24,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- *
+ * Packager for creating a serialized bag in the form of a tarball
+ * <p>
  * Created by shake on 8/28/15.
  */
 @SuppressWarnings({"FieldCanBeLocal", "WeakerAccess"})
@@ -53,7 +54,7 @@ public class TarPackager implements Packager {
             OutputStream os = new FileOutputStream(tarball.toString());
             outputStream = new TarArchiveOutputStream(os);
             outputStream.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
-        }catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             log.error("Error create TarArchiveOutputStream", e);
             // throw an exception
         }
@@ -66,56 +67,110 @@ public class TarPackager implements Packager {
 
     @Override
     public void finishBuild(PackagerData data) {
-        try {
-            OutputStream os = data.getOs();
-            os.close();
+        try (OutputStream os = data.getOs()) {
+            log.debug("Autoclosing outputstream");
         } catch (IOException e) {
             log.error("Error closing Tar OutputStream", e);
         }
     }
 
     @Override
-    public HashCode writeTagFile(TagFile tagFile, HashFunction function, PackagerData data) {
+    public HashCode writeTagFile(TagFile tagFile, HashFunction function, PackagerData data) throws IOException {
         Path path = getTarPath(data.getName(), tagFile.getPath());
-        return writeFile(function, tagFile.getInputStream(), path.toString(), tagFile.getSize(), data);
+        try (InputStream is = tagFile.getInputStream()) {
+            return writeFile(function, is, path.toString(), tagFile.getSize(), data);
+        }
     }
 
     @Override
-    public HashCode writeManifest(Manifest manifest, HashFunction function, PackagerData data) {
+    public HashCode writeManifest(Manifest manifest, HashFunction function, PackagerData data) throws IOException {
         Path path = getTarPath(data.getName(), manifest.getPath());
-        return writeFile(function, manifest.getInputStream(), path.toString(), manifest.getSize(), data);
+        try (InputStream is = manifest.getInputStream()) {
+            return writeFile(function, is, path.toString(), manifest.getSize(), data);
+        }
     }
 
     @Override
-    public HashCode writePayloadFile(PayloadFile payloadFile, HashFunction function, PackagerData data) {
+    public HashCode writePayloadFile(PayloadFile payloadFile, HashFunction function, PackagerData data) throws IOException {
         Path path = getTarPath(data.getName(), payloadFile.getFile());
-        return writeFile(function, payloadFile.getInputStream(), path.toString(), payloadFile.getSize(), data);
+        try (InputStream is = payloadFile.getInputStream()) {
+            return writeFile(function, is, path.toString(), payloadFile.getSize(), data);
+        }
     }
 
-    private HashCode writeFile(HashFunction function, InputStream is,  String path, long size, PackagerData data) {
+    private HashCode writeFile(HashFunction function, InputStream is, String path, long size, PackagerData data) throws IOException {
         HashingInputStream his = null;
         OutputStream os = data.getOs();
         // Figure this out/clean it up a bit
-        if (! (os instanceof TarArchiveOutputStream)) {
+        if (!(os instanceof TarArchiveOutputStream)) {
             log.error("Cannot package tar archive to non tar stream");
-            return HashCode.fromInt(0);
+            return function.newHasher().hash();
         }
 
         TarArchiveOutputStream outputStream = (TarArchiveOutputStream) os;
+
         TarArchiveEntry entry = new TarArchiveEntry(path);
+        log.trace("Setting payload size of " + size);
+        entry.setSize(size);
+        outputStream.putArchiveEntry(entry);
+        long written = outputStream.getBytesWritten();
+        his = new HashingInputStream(function, is);
         try {
-            log.trace("Setting payload size of " + size);
-            entry.setSize(size);
-            outputStream.putArchiveEntry(entry);
-            his = new HashingInputStream(function, is);
             transfer(his, outputStream);
-            outputStream.closeArchiveEntry();
         } catch (IOException e) {
             log.error("Error writing TarArchiveEntry {}", path, e);
-            return null;
+            failArchiveEntry(size, written, outputStream);
+            throw e;
         }
+        outputStream.closeArchiveEntry();
 
         return his.hash();
+    }
+
+    /**
+     * I'm not really sure of the best way to handle this, but we NEED to close the archive entry
+     * in order to be able to close the tarball and be able to release the file descriptor. So
+     * what we end up doing is pretty straightforward - calculate how much of the current Archive
+     * Entry we've written, and see how much we still need to write. Then we fill the Entry with
+     * junk (we're failing anyways), and if any errors happen along the way we just log them
+     * because what else can we do?
+     *
+     * @param size         - the size of the ArchiveEntry
+     * @param written      - how much was written to the OutputStream before starting the entry
+     * @param outputStream - the OutputStream
+     */
+    private void failArchiveEntry(long size, long written, TarArchiveOutputStream outputStream) {
+        log.info("Attempting to fill out archive entry so underlying stream can be closed");
+        long current = outputStream.getBytesWritten();
+        long delta = current - written;
+        long fill = size - delta;
+        log.debug("size={}, written={}, current={}, delta={}", new Object[]{size, written, current, delta});
+        log.debug("Need to write {} bytes", fill);
+
+        if (fill < 0) {
+            log.error("Error calculating amount of bytes to fill, OutputStream will remain open!");
+        }
+
+        log.warn("Filling TarOutputStream with junk to close ArchiveEntry");
+        while (fill >= 0) {
+            try {
+                // fill the os with junk
+                // todo: this is probably slow as. need to revisit.
+                outputStream.write(0b00000000);
+                fill--;
+            } catch (IOException e) {
+                // ?? Not sure of the best course of action here
+                log.error("", e);
+                fill = -1;
+            }
+        }
+
+        log.warn("Closing ArchiveEntry");
+        try {
+            outputStream.closeArchiveEntry();
+        } catch (IOException e) {
+            log.error("Unable to close ArchiveEntry, OutputStream will remain open!", e);
+        }
     }
 
     private Path getTarPath(String name, Path relPath) {
@@ -127,10 +182,9 @@ public class TarPackager implements Packager {
      * Transfer the content of the input stream to the output stream
      * without closing the underlying output stream (by calling wrch.close())
      *
-     * @param is
-     * @param os
-     * @return
-     * @throws IOException
+     * @param is the InputStream to transfer from
+     * @param os the OutputStream to transfer to
+     * @throws IOException if there's a problem transferring bytes
      */
     @Override
     public void transfer(InputStream is, OutputStream os) throws IOException {
