@@ -12,6 +12,7 @@ import org.chronopolis.bag.packager.PackagerData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
@@ -62,7 +63,7 @@ public class WriteJob implements Callable<WriteResult>, Supplier<WriteResult> {
         return result;
     }
 
-    private void writeTagManifest(Bag bag, HashFunction hash, TagManifest tagManifest, PackagerData data) {
+    private void writeTagManifest(Bag bag, HashFunction hash, TagManifest tagManifest, PackagerData data) throws IOException {
         HashCode hashCode;
 
         // Write the tagmanifest
@@ -74,7 +75,7 @@ public class WriteJob implements Callable<WriteResult>, Supplier<WriteResult> {
         log.debug("HashCode is {}", receipt);
     }
 
-    private void writeTagFiles(Bag bag, HashFunction hash, TagManifest tagManifest, PackagerData data) {
+    private void writeTagFiles(Bag bag, HashFunction hash, TagManifest tagManifest, PackagerData data) throws IOException {
         HashCode hashCode;
 
         // Write tag files
@@ -88,7 +89,7 @@ public class WriteJob implements Callable<WriteResult>, Supplier<WriteResult> {
         }
     }
 
-    private void writeManifest(Bag bag, HashFunction hash, TagManifest tagManifest, PackagerData data) {
+    private void writeManifest(Bag bag, HashFunction hash, TagManifest tagManifest, PackagerData data) throws IOException {
         HashCode hashCode;
 
         // Write manifest
@@ -99,7 +100,7 @@ public class WriteJob implements Callable<WriteResult>, Supplier<WriteResult> {
         log.debug("HashCode is {}", hashCode.toString());
     }
 
-    private void writePayloadFiles(Bag bag, HashFunction hash, PackagerData data) {
+    private void writePayloadFiles(Bag bag, HashFunction hash, PackagerData data) throws IOException {
         HashCode hashCode;
 
         // Write payload files
