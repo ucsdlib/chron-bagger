@@ -1,82 +1,27 @@
 package org.chronopolis.bag.packager;
 
 import com.google.common.hash.HashCode;
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hashing;
 import org.chronopolis.bag.core.BagIt;
 import org.chronopolis.bag.core.Digest;
 import org.chronopolis.bag.core.Manifest;
 import org.chronopolis.bag.core.PayloadFile;
 import org.chronopolis.bag.core.PayloadManifest;
-import org.chronopolis.bag.core.TagFile;
-import org.chronopolis.bag.writer.IOExceptionStream;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 
 /**
  *
  * Created by shake on 5/16/16.
  */
-public class DirectoryPackagerTest {
+public class DirectoryPackagerTest extends PackagerTest {
 
-    private final HashFunction func = Hashing.sha256();
     private final String bagitHash = "b1d4cb0d13cb1d9ab509ff9048c4f8d9720bf73ec5856320b1c8ed8c81cd61e1";
-
-    private Path out = com.google.common.io.Files.createTempDir().toPath(); // Paths.get(System.getProperty("java.io.tmpdir"), "bag-writer-tests");
-
-    private PayloadFile f;
-
-    @Before
-    public void setup() throws IOException {
-
-        String tags = ClassLoader.getSystemClassLoader()
-                                 .getResource("payload").getPath();
-
-        Path payload = Paths.get(tags, "payload-file");
-        f = new PayloadFile();
-        f.setFile("payload-file");
-        f.setOrigin(payload);
-        f.setDigest(com.google.common.io.Files.hash(payload.toFile(), func));
-    }
-
-    @After
-    public void teardown() throws IOException {
-        Files.walkFileTree(out, new FileVisitor<Path>() {
-            @Override
-            public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes basicFileAttributes) throws IOException {
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFile(Path path, BasicFileAttributes basicFileAttributes) throws IOException {
-                Files.delete(path);
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFileFailed(Path path, IOException e) throws IOException {
-                return FileVisitResult.TERMINATE;
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path path, IOException e) throws IOException {
-                Files.delete(path);
-                return FileVisitResult.CONTINUE;
-            }
-        });
-    }
 
     private DirectoryPackager startPackager() {
         return new DirectoryPackager(out);
@@ -111,7 +56,6 @@ public class DirectoryPackagerTest {
     public void writeTagIO() throws Exception {
         String testName = "tag-files-ioe";
 
-        Path bag = out.resolve(testName);
         DirectoryPackager packager = startPackager();
         PackagerData data = packager.startBuild(testName);
         IOTagFile tag = new IOTagFile();
@@ -195,63 +139,4 @@ public class DirectoryPackagerTest {
         // Assert.assertFalse(Files.exists(fileInBag));
     }
 
-    class IOManifest implements Manifest {
-
-        @Override
-        public Digest getDigest() {
-            return Digest.SHA_256;
-        }
-
-        @Override
-        public Manifest setDigest(Digest digest) {
-            return this;
-        }
-
-        @Override
-        public long getSize() {
-            return 42;
-        }
-
-        @Override
-        public Path getPath() {
-            return Paths.get("manifest-ioe.txt");
-        }
-
-        @Override
-        public InputStream getInputStream() {
-            return new IOExceptionStream();
-        }
-    }
-
-    class IOTagFile implements TagFile {
-
-        @Override
-        public long getSize() {
-            return 42;
-        }
-
-        @Override
-        public Path getPath() {
-            return Paths.get("ioe");
-        }
-
-        @Override
-        public InputStream getInputStream() {
-            return new IOExceptionStream();
-        }
-    }
-
-    private class IOPayloadFile extends PayloadFile {
-
-        @Override
-        public Path getFile() {
-            return Paths.get("payload-ioe");
-        }
-
-        @Override
-        public InputStream getInputStream() {
-            return new IOExceptionStream();
-        }
-
-    }
 }

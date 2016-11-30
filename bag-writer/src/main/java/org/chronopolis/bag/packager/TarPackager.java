@@ -68,7 +68,7 @@ public class TarPackager implements Packager {
     @Override
     public void finishBuild(PackagerData data) {
         try (OutputStream os = data.getOs()) {
-            log.debug("Autoclosing outputstream");
+            log.trace("Autoclosing outputstream");
         } catch (IOException e) {
             log.error("Error closing Tar OutputStream", e);
         }
