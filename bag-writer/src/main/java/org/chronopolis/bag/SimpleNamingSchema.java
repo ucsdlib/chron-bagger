@@ -1,4 +1,4 @@
-package org.chronopolis.bag.writer;
+package org.chronopolis.bag;
 
 /**
  * Schema to name bags based on a given string

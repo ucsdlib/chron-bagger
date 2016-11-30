@@ -1,4 +1,4 @@
-package org.chronopolis.bag.writer;
+package org.chronopolis.bag.packager;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
@@ -24,43 +24,50 @@ public interface Packager {
     /**
      * Start a build using the given bag name
      *
-     * @param bagName
+     * @param bagName the name of the bag
      */
-    void startBuild(String bagName);
+    PackagerData startBuild(String bagName);
 
     /**
      * Finish a build
      *
      */
-    void finishBuild();
+    void finishBuild(PackagerData data);
 
     /**
      * Write a tag file to the bag
      *
-     * @param tagFile
-     * @param function
+     * @param tagFile  The TagFile to write
+     * @param function The HashFunction to use
      * @return the digest of the tag file
      */
-    HashCode writeTagFile(TagFile tagFile, HashFunction function);
+    HashCode writeTagFile(TagFile tagFile, HashFunction function, PackagerData data) throws IOException;
 
     /**
      * Write the manifest file of the bag
      *
-     * @param manifest
-     * @param function
+     * @param manifest The manifest to write
+     * @param function The HashFunction to use
      * @return the digest of the manifest
      */
-    HashCode writeManifest(Manifest manifest, HashFunction function);
+    HashCode writeManifest(Manifest manifest, HashFunction function, PackagerData data) throws IOException;
 
     /**
      * Write a payload file to the data directory of the bag
      *
-     * @param payloadFile
-     * @param function
+     * @param payloadFile The PayloadFile to write
+     * @param function The HashFunction to use
      * @return the digest of the payload file
      */
-    HashCode writePayloadFile(PayloadFile payloadFile, HashFunction function);
+    HashCode writePayloadFile(PayloadFile payloadFile, HashFunction function, PackagerData data) throws IOException;
 
+    /**
+     * Transfer bytes from an InputStream to an OutputStream using Channels
+     *
+     * @param is the InputStream to read from
+     * @param os the OutputStream to write to
+     * @throws IOException if there's an exception transferring bytes
+     */
     default void transfer(InputStream is, OutputStream os) throws IOException {
         ReadableByteChannel inch = Channels.newChannel(is);
         WritableByteChannel wrch = Channels.newChannel(os);

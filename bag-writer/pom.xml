@@ -7,11 +7,11 @@
     <parent>
         <groupId>org.chronopolis</groupId>
         <artifactId>bagger</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>bag-writer</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
 
     <!--
     <build>
@@ -21,7 +21,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.chronopolis.bag.writer.Main</mainClass>
+                            <mainClass>org.chronopolis.bag.Main</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

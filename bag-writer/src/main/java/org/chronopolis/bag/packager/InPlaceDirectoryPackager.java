@@ -1,4 +1,4 @@
-package org.chronopolis.bag.writer;
+package org.chronopolis.bag.packager;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
@@ -29,19 +29,23 @@ public class InPlaceDirectoryPackager extends DirectoryPackager {
     }
 
     @Override
-    public void startBuild(String name) {
+    public PackagerData startBuild(String name) {
+        PackagerData data = new PackagerData();
         if (!base.endsWith(name)) {
             log.warn("Top level directory for bag {} does not match", name);
         }
+        data.setName(name);
+        data.setWrite(base);
+        return data;
     }
 
     @Override
-    public void finishBuild() {
+    public void finishBuild(PackagerData data) {
         // Nothing to do (as of now)
     }
 
     @Override
-    public HashCode writeTagFile(TagFile tagFile, HashFunction function) {
+    public HashCode writeTagFile(TagFile tagFile, HashFunction function, PackagerData data) {
         HashCode hash = null;
 
         Path tag = base.resolve(tagFile.getPath());
@@ -65,12 +69,12 @@ public class InPlaceDirectoryPackager extends DirectoryPackager {
     }
 
     @Override
-    public HashCode writeManifest(Manifest manifest, HashFunction function) {
-        return writeTagFile(manifest, function);
+    public HashCode writeManifest(Manifest manifest, HashFunction function, PackagerData data) {
+        return writeTagFile(manifest, function, data);
     }
 
     @Override
-    public HashCode writePayloadFile(PayloadFile payloadFile, HashFunction function) {
+    public HashCode writePayloadFile(PayloadFile payloadFile, HashFunction function, PackagerData data) {
         // Ensure that all the directories are created first
         Path payload = base.resolve(payloadFile.getFile());
         HashCode hash = null;

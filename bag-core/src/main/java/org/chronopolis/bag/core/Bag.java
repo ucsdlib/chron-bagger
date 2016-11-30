@@ -16,6 +16,8 @@ import java.util.Set;
 
 /**
  * TODO: Should we have a notion of a closed bag and an open bag?
+ *       Or maybe read only/some version of an immutable bag?
+ * TODO: maxFiles
  *
  * Created by shake on 7/29/15.
  */
@@ -28,6 +30,7 @@ public class Bag {
     // Used for the PayloadOxum
     private long size = 0;
     private long numFiles = 0;
+    private double maxSize = -1;
 
     // Used for the BagCount
     private int number = 0;
@@ -54,6 +57,7 @@ public class Bag {
         this.tags = new HashMap<>();
         this.files = new HashMap<>();
 		this.tagManifest = new TagManifest();
+        this.manifest = new PayloadManifest();
 	}
 
     public void prepareForWrite() {
@@ -101,6 +105,15 @@ public class Bag {
 		this.size = size;
         return this;
 	}
+
+	public double getMaxSize() {
+        return maxSize;
+    }
+
+    public Bag setMaxSize(double maxSize) {
+        this.maxSize = maxSize;
+        return this;
+    }
 
 	public long getNumFiles() {
 		return numFiles;
@@ -150,11 +163,12 @@ public class Bag {
 	}
 
 	public Bag addTag(TagFile tag) {
+        TagFile copy = TagFile.copy(tag);
         if (tags == null) {
             tags = new HashMap<>();
         }
 
-        this.tags.put(tag.getPath(), tag);
+        this.tags.put(copy.getPath(), copy);
         return this;
 	}
     
@@ -332,4 +346,30 @@ public class Bag {
         return this;
     }
 
+    /**
+     * Try to add a file to a bag
+     * if successful, the manifest, and all metadata is updated to reflect
+     * the current state of the bag
+     *
+     * @param file the file to add
+     * @return success of adding the file
+     */
+    public boolean tryAdd(PayloadFile file) {
+        if (maxSize == -1 || file.getSize() + size <= maxSize) {
+            files.put(file.getFile(), file);
+            manifest.addPayloadFile(file);
+
+            ++numFiles;
+            size += file.getSize();
+
+            return true;
+        }
+
+
+        return false;
+    }
+
+    public boolean isEmpty() {
+        return files.isEmpty();
+    }
 }
