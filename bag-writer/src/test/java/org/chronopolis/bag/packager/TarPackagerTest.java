@@ -1,5 +1,7 @@
 package org.chronopolis.bag.packager;
 
+import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.chronopolis.bag.core.BagIt;
 import org.junit.Assert;
 import org.junit.Test;
@@ -36,7 +38,8 @@ public class TarPackagerTest extends PackagerTest {
 
         boolean exception = false;
         try {
-            data.getOs().write(0);
+            TarArchiveOutputStream taos = (TarArchiveOutputStream) data.getOs();
+            taos.putArchiveEntry(new ArArchiveEntry("test-archive", 100));
         } catch (IOException e) {
             exception = true;
         }
