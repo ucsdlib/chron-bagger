@@ -19,6 +19,7 @@ import org.chronopolis.bag.packager.PackagerData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -168,7 +169,7 @@ public class SimpleWriter extends Writer {
         }
     }
 
-    private void writeTagManifest(Bag bag, HashFunction hash, TagManifest tagManifest, PackagerData data) {
+    private void writeTagManifest(Bag bag, HashFunction hash, TagManifest tagManifest, PackagerData data) throws IOException {
         HashCode hashCode;
 
         // Write the tagmanifest
@@ -178,7 +179,7 @@ public class SimpleWriter extends Writer {
         log.debug("HashCode is: {}\n", hashCode.toString());
     }
 
-    private void writeTagFiles(Bag bag, HashFunction hash, TagManifest tagManifest, PackagerData data) {
+    private void writeTagFiles(Bag bag, HashFunction hash, TagManifest tagManifest, PackagerData data) throws IOException {
         HashCode hashCode;
 
         // Write tag files
@@ -192,7 +193,7 @@ public class SimpleWriter extends Writer {
         }
     }
 
-    private void writeManifest(Bag bag, HashFunction hash, TagManifest tagManifest, PackagerData data) {
+    private void writeManifest(Bag bag, HashFunction hash, TagManifest tagManifest, PackagerData data) throws IOException {
         HashCode hashCode;
 
         // Write manifest
@@ -203,7 +204,7 @@ public class SimpleWriter extends Writer {
         log.debug("HashCode is: {}\n", hashCode.toString());
     }
 
-    private void writePayloadFiles(Bag bag, HashFunction hash, PackagerData data) {
+    private void writePayloadFiles(Bag bag, HashFunction hash, PackagerData data) throws IOException {
         HashCode hashCode;
 
         // Write payload files
