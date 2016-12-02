@@ -54,6 +54,7 @@ public class TarPackager implements Packager {
             OutputStream os = new FileOutputStream(tarball.toString());
             outputStream = new TarArchiveOutputStream(os);
             outputStream.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
+            outputStream.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_STAR);
         } catch (FileNotFoundException e) {
             log.error("Error create TarArchiveOutputStream", e);
             // throw an exception

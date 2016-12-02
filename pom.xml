@@ -7,7 +7,7 @@
     <groupId>org.chronopolis</groupId>
     <artifactId>bagger</artifactId>
     <name>Bagging API</name>
-    <version>1.1.0-RELEASE</version>
+    <version>1.1.1-RELEASE</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -43,7 +43,7 @@
             <dependency>
                 <groupId>org.chronopolis</groupId>
                 <artifactId>bag-core</artifactId>
-                <version>1.1.0-RELEASE</version>
+                <version>1.1.1-RELEASE</version>
             </dependency>
 
             <dependency>
