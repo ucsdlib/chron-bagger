@@ -23,9 +23,6 @@ public class PayloadFile {
     private Path origin;
     private HashCode digest;
 
-    public PayloadFile() {
-    }
-
     public Path getFile() {
         return file;
     }

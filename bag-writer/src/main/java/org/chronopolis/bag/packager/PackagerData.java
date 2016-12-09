@@ -14,8 +14,6 @@ public class PackagerData {
     private String name;
     private OutputStream os;
 
-    public PackagerData() {
-    }
 
     public Path getWrite() {
         return write;
