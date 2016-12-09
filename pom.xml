@@ -32,10 +32,15 @@
 
     <distributionManagement>
         <repository>
-            <id>deployment</id>
-            <name>Snapshots</name>
-            <url>https://scm.umiacs.umd.edu/maven/adapt/content/repositories/snapshots/</url>
+            <id>adapt-releases</id>
+            <name>releases</name>
+            <url>https://scm.umiacs.umd.edu/adapt/repository/maven-releases/</url>
         </repository>
+        <snapshotRepository>
+            <id>adapt-snapshots</id>
+            <name>snapshots</name>
+            <url>https://scm.umiacs.umd.edu/adapt/repository/maven-snapshots/</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <dependencyManagement>
@@ -124,6 +129,4 @@
             <artifactId>logback-classic</artifactId>
         </dependency>
     </dependencies>
-
-
 </project>
