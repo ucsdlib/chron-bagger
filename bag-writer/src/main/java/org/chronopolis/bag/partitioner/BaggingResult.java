@@ -12,9 +12,9 @@ import java.util.List;
  */
 public class BaggingResult {
 
-    final boolean success;
-    final List<Bag> bags;
-    final List<PayloadFile> rejected;
+    private final boolean success;
+    private final List<Bag> bags;
+    private final List<PayloadFile> rejected;
 
     public BaggingResult(boolean success, List<Bag> bags, List<PayloadFile> rejected) {
         this.success = success;
