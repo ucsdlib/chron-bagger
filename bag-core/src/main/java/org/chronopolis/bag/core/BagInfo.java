@@ -101,7 +101,7 @@ public class BagInfo implements TagFile {
                     .append(": ")
                     .append(entry.getValue())
                     .append("\r\n");
-            size += tag.toString().length();
+            size += tag.length();
         }
         return size;
     }
