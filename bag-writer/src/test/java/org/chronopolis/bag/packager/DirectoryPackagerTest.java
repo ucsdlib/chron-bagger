@@ -126,17 +126,13 @@ public class DirectoryPackagerTest extends PackagerTest {
     @Test(expected = IOException.class)
     public void writePayloadIO() throws Exception {
         String testName = "payload-ioe";
-        Path bag = out.resolve(testName);
 
         DirectoryPackager packager = startPackager();
         PackagerData data = packager.startBuild(testName);
         PayloadFile payload = new IOPayloadFile();
 
         HashCode hash = packager.writePayloadFile(payload, func, data);
-
-        Path fileInBag = bag.resolve(payload.getFile());
         Assert.assertNull(hash);
-        // Assert.assertFalse(Files.exists(fileInBag));
     }
 
 }

@@ -54,6 +54,7 @@ public class Bagger {
     }
 
     // setters... wonder if there's a good way to move these out of this class
+    // TODO: Null checks
 
     public Bagger withMaxSize(int size, Unit unit) {
         this.max = unit.size() * size;
@@ -116,7 +117,7 @@ public class Bagger {
     }
 
     private void updateMetadata(List<Bag> finished) {
-        tags.add(new BagIt());
+        tags.add(bagit);
         for (Bag bag : finished) {
             int idx = finished.indexOf(bag);
             tags.forEach(bag::addTag);
