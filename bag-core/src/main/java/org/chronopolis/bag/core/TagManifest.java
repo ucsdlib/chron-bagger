@@ -45,7 +45,7 @@ public class TagManifest implements Manifest {
         long size = 0;
         for (Map.Entry<Path, HashCode> entry : files.entrySet()) {
             String line = entry.getValue().toString() + "  " + entry.getKey().toString() + "\n";
-            size += line.length();
+            size += line.getBytes().length;
         }
         return size;
     }

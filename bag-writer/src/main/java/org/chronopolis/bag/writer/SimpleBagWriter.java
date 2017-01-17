@@ -41,6 +41,7 @@ public class SimpleBagWriter implements BagWriter {
     }
 
     // Just a helper so we have a clean map above
+    // TODO should we have a WriteJobFactory so we can create custom WriteJobs?
     private WriteResult fromBag(Bag bag) {
         WriteJob job = new WriteJob(bag, validate, packager);
         return job.get();
