@@ -82,7 +82,7 @@ public class PayloadManifest implements Manifest {
         long size = 0;
         for (PayloadFile file : files.values()) {
             String line = file.getDigest().toString() + "  " + file.getFile().toString() + "\n";
-            size += line.length();
+            size += line.getBytes().length;
         }
         return size;
     }

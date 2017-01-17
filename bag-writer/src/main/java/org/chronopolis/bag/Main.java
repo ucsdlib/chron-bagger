@@ -2,6 +2,7 @@ package org.chronopolis.bag;
 
 import org.chronopolis.bag.core.Bag;
 import org.chronopolis.bag.core.BagInfo;
+import org.chronopolis.bag.core.OnDiskTagFile;
 import org.chronopolis.bag.core.PayloadManifest;
 import org.chronopolis.bag.core.Unit;
 import org.chronopolis.bag.packager.TarPackager;
@@ -48,6 +49,7 @@ public class Main {
         Bagger baggins = new Bagger()
                 .withBagInfo(info)
                 .withMaxSize(300, Unit.MEGABYTE)
+                .withTagFile(new OnDiskTagFile(tag))
                 .withPayloadManifest(payloadManifest)
                 .withNamingSchema(new UUIDNamingSchema());
                 // .withNamingSchema(new SimpleNamingSchema("test-bag"));

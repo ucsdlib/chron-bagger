@@ -13,6 +13,13 @@ import java.util.Iterator;
  */
 public class PayloadInputStream extends InputStream {
 
+    private ByteBuffer current;
+    private Iterator<PayloadFile> it;
+
+    public PayloadInputStream(Iterable<PayloadFile> files) {
+        it = files.iterator();
+    }
+
     @Override
     public int read() throws IOException {
         if (current == null || current.position() == current.limit()) {
@@ -28,12 +35,4 @@ public class PayloadInputStream extends InputStream {
 
         return current.get();
     }
-
-    private ByteBuffer current;
-    private Iterator<PayloadFile> it;
-
-    public PayloadInputStream(Iterable<PayloadFile> files) {
-        it = files.iterator();
-    }
-
 }

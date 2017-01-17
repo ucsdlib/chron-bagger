@@ -1,8 +1,6 @@
 package org.chronopolis.bag.core;
 
 import com.google.common.collect.Maps;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -22,9 +20,8 @@ import java.util.Set;
  * Created by shake on 7/29/15.
  */
 public class Bag {
-    private final Logger log = LoggerFactory.getLogger(Bag.class);
 
-	// Used as the base directory
+    // Used as the base directory
     private String name;
 
     // Used for the PayloadOxum

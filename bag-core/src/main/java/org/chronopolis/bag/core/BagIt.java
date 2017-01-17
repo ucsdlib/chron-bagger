@@ -42,7 +42,7 @@ public class BagIt implements TagFile {
     public long getSize() {
         long size = 0;
         for (String tag : tags) {
-            size += tag.length();
+            size += tag.getBytes().length;
         }
         return size;
     }

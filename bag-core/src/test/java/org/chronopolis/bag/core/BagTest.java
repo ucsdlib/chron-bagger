@@ -18,9 +18,9 @@ import java.util.Map;
  * Created by shake on 5/12/16.
  */
 public class BagTest {
-    final TestPayloadFile testFile = new TestPayloadFile(Paths.get("some-payload-file"), 1L);
-    final TestPayloadFile testFile2 = new TestPayloadFile(Paths.get("some-other-payload-file"), 5L);
-    final TestPayloadFile testFile3 = new TestPayloadFile(Paths.get("some-large-payload-file"), 5000L);
+    private final TestPayloadFile testFile = new TestPayloadFile(Paths.get("some-payload-file"), 1L);
+    private final TestPayloadFile testFile2 = new TestPayloadFile(Paths.get("some-other-payload-file"), 5L);
+    private final TestPayloadFile testFile3 = new TestPayloadFile(Paths.get("some-large-payload-file"), 5000L);
 
     @Test
     public void testBagBasic() {
@@ -163,8 +163,8 @@ public class BagTest {
 
     private class TestPayloadFile extends PayloadFile {
 
-        long size;
-        Path file;
+        private long size;
+        private Path file;
 
         TestPayloadFile(Path file, long size) {
             this.file = file;

@@ -2,8 +2,6 @@ package org.chronopolis.bag.writer;
 
 import org.chronopolis.bag.core.Bag;
 import org.chronopolis.bag.packager.Packager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -15,13 +13,12 @@ import java.util.stream.Collectors;
  * Created by shake on 11/16/16.
  */
 public class SimpleBagWriter implements BagWriter {
-    private final Logger log = LoggerFactory.getLogger(SimpleBagWriter.class);
 
     private boolean validate;
     private Packager packager;
 
-    public SimpleBagWriter() {
-    }
+    // TODO: Should we just have a constructor for these and
+    //       not have any setters?
 
     @Override
     public BagWriter validate(boolean validate) {
@@ -44,6 +41,7 @@ public class SimpleBagWriter implements BagWriter {
     }
 
     // Just a helper so we have a clean map above
+    // TODO should we have a WriteJobFactory so we can create custom WriteJobs?
     private WriteResult fromBag(Bag bag) {
         WriteJob job = new WriteJob(bag, validate, packager);
         return job.get();

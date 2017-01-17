@@ -49,10 +49,10 @@ public class WriteJob implements Callable<WriteResult>, Supplier<WriteResult> {
         try {
             data = packager.startBuild(bag.getName());
             TagManifest tagManifest = bag.getTagManifest();
-            writePayloadFiles(bag, hash, data);
             writeManifest(bag, hash, tagManifest, data);
             writeTagFiles(bag, hash, tagManifest, data);
             writeTagManifest(bag, hash, tagManifest, data);
+            writePayloadFiles(bag, hash, data);
         } catch (Exception e) {
             result.setSuccess(false);
             log.error("Error building bag!", e);
@@ -84,7 +84,7 @@ public class WriteJob implements Callable<WriteResult>, Supplier<WriteResult> {
             log.debug("{}", tag.getPath());
             hashCode = packager.writeTagFile(tag, hash, data);
             tagManifest.addTagFile(tag.getPath(), hashCode);
-            bag.addTag(tag);
+            // bag.addTag(tag);
             log.debug("HashCode is {}", hashCode.toString());
         }
     }
