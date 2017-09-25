@@ -5,7 +5,8 @@ import java.util.Set;
 
 /**
  * Encapsulating class to contain information about the time to write for
- * a Bag, its manifests, and its payload files
+ * a Bag, its manifests, and its payload files. By default everything is
+ * empty (for a metric - 0b;0f;0ms) so that we do not return null.
  *
  * @author shake
  */
@@ -17,39 +18,29 @@ public class WriteMetrics {
     private Metric bag = new Metric();
 
     /**
-     * Metric covering bagit.txt
-     */
-    private Metric bagIt = new Metric();
-
-    /**
-     * Metric covering bag-info.txt
-     */
-    private Metric bagInfo = new Metric();
-
-    /**
      * Metric covering all payload file writes
      */
-    private Metric payload;
+    private Metric payload = new Metric();
 
     /**
      * Metric covering a single manifest-$alg.txt
      */
-    private Metric manifest;
+    private Metric manifest = new Metric();
 
     /**
      * Metric covering a single tagmanifest-$alg.txt
      */
-    private Metric tagmanifest;
+    private Metric tagmanifest = new Metric();
 
     /**
      * Group to capture all extra tag files
      */
-    private Set<Metric> extraTags;
+    private Set<Metric> extraTags = new HashSet<>();
 
     /**
      * Group to capture all payload file writes
      */
-    private Set<Metric> payloadFiles;
+    private Set<Metric> payloadFiles = new HashSet<>();
 
     public WriteMetrics() {
         this.extraTags = new HashSet<>();
@@ -62,24 +53,6 @@ public class WriteMetrics {
 
     public WriteMetrics setBag(Metric bag) {
         this.bag = bag;
-        return this;
-    }
-
-    public Metric getBagIt() {
-        return bagIt;
-    }
-
-    public WriteMetrics setBagIt(Metric bagIt) {
-        this.bagIt = bagIt;
-        return this;
-    }
-
-    public Metric getBagInfo() {
-        return bagInfo;
-    }
-
-    public WriteMetrics setBagInfo(Metric bagInfo) {
-        this.bagInfo = bagInfo;
         return this;
     }
 
