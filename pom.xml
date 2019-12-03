@@ -34,7 +34,7 @@
         <repository>
             <id>ucsd.artifactory</id>
             <name>lib-artifacts-releases</name>
-            <url>https://lib-artifacts.ucsd.edu/artifactory/libs-release</url>
+            <url>https://lib-artifacts.ucsd.edu/artifactory/maven-release-local</url>
         </repository>
     </distributionManagement>
 
